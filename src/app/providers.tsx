@@ -25,7 +25,7 @@ const networks = [mainnet, arbitrum, base, polygon]
 
 // Create Wagmi Adapter
 const wagmiAdapter = new WagmiAdapter({
-  networks,
+  networks: networks as any,
   projectId,
   ssr: true,
 })
@@ -33,7 +33,7 @@ const wagmiAdapter = new WagmiAdapter({
 // Initialize AppKit modal
 createAppKit({
   adapters: [wagmiAdapter],
-  networks,
+  networks: networks as any,
   projectId,
   metadata,
   features: { analytics: true },
