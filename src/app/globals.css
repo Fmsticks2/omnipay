@@ -24,3 +24,13 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* AppKit / Web3Modal accent overrides to ensure black button */
+:root {
+  --w3m-accent: #000000;
+}
+.w3m-button, .w3m-button button {
+  background-color: #000 !important;
+  color: #fff !important;
+  border-color: rgba(0,0,0,0.08) !important;
+}

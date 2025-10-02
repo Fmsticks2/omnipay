@@ -10,12 +10,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <div className="absolute top-24 right-12 h-64 w-64 rounded-full bg-violet-400/20 blur-3xl" />
       </div>
 
-      <div className="relative mx-auto max-w-screen-2xl px-4 sm:px-6 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-6 lg:gap-8">
+      <div className="relative mx-auto max-w-screen-2xl px-4 sm:px-6 py-10">
+        <div className="mx-auto grid grid-cols-1 lg:grid-cols-[340px_1fr] gap-6 lg:gap-10 items-start justify-center">
           {/* Sidebar */}
-          <aside className="rounded-2xl border border-black/[.08] dark:border-white/[.145] bg-white/70 dark:bg-black/40 backdrop-blur p-4 lg:p-5">
+          <aside className="rounded-3xl border border-black/[.08] dark:border-white/[.145] bg-white/70 dark:bg-black/40 backdrop-blur p-6 lg:p-7 ring-1 ring-white/10 shadow-[0_0_40px_rgba(168,85,247,0.25)]">
             <div className="text-xl font-bold tracking-tight">OmniPay</div>
-            <nav className="mt-4 flex flex-col gap-2 text-sm">
+            <nav className="mt-4 flex flex-col gap-3 text-sm">
               <Link className="rounded-lg px-3 py-2 hover:bg-neutral-100 dark:hover:bg-neutral-800" href="/dashboard">Overview</Link>
               <Link className="rounded-lg px-3 py-2 hover:bg-neutral-100 dark:hover:bg-neutral-800" href="/dashboard/orders">Orders</Link>
               <Link className="rounded-lg px-3 py-2 hover:bg-neutral-100 dark:hover:bg-neutral-800" href="/dashboard/transactions">Transactions</Link>
@@ -25,7 +25,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </aside>
 
           {/* Content */}
-          <main className="rounded-2xl border border-black/[.08] dark:border-white/[.145] bg-white/70 dark:bg-black/40 backdrop-blur p-6 lg:p-8">
+          <main className="rounded-3xl border border-black/[.08] dark:border-white/[.145] bg-white/70 dark:bg-black/40 backdrop-blur p-6 lg:p-10 ring-1 ring-white/10 shadow-[0_0_40px_rgba(34,197,94,0.20)]">
             {children}
           </main>
         </div>

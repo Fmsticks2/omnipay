@@ -37,6 +37,10 @@ createAppKit({
   projectId,
   metadata,
   features: { analytics: true },
+  // Accent color for modal/button styling
+  themeVariables: {
+    "--w3m-accent": "#000000",
+  },
 })
 
 export function Providers({ children }: { children: React.ReactNode }) {
