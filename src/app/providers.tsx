@@ -17,7 +17,7 @@ const metadata = {
   name: "OmniPay",
   description: "Universal cross-chain payments gateway",
   url: typeof window !== "undefined" ? window.location.origin : "https://localhost",
-  icons: ["/next.svg"],
+  icons: ["/omnipay.svg"],
 }
 
 // Define EVM networks and conditionally add Push Chain Testnet via env

@@ -3,6 +3,11 @@ import Link from "next/link"
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-white to-neutral-50 dark:from-black dark:to-neutral-900">
+      {/* Top-left logo */}
+      <Link href="/" className="absolute top-6 left-6 inline-flex items-center gap-2">
+        <img src="/omnipay.svg" alt="OmniPay logo" className="h-9 w-9" />
+        <span className="sr-only">OmniPay</span>
+      </Link>
       {/* Glow effects */}
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute -top-24 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-fuchsia-400/20 blur-3xl" />
@@ -29,6 +34,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             {children}
           </main>
         </div>
+        {/* Bottom logo */}
+        <footer className="relative mt-8 text-sm text-neutral-600 flex items-center justify-center gap-2">
+          <img src="/omnipay.svg" alt="OmniPay logo" className="h-5 w-5" />
+          <span>OmniPay</span>
+        </footer>
       </div>
     </div>
   )

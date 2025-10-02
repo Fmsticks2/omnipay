@@ -17,6 +17,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "OmniPay — Universal Cross-Chain Payments",
   description: "Enterprise-grade universal payment gateway on Push Chain",
+  icons: { icon: "/omnipay.svg" },
 }
 
 export default function RootLayout({
