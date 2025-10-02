@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@pushchain/ui-kit": "^2.0.8",
     "@reown/appkit": "^1.8.8",
     "@reown/appkit-adapter-wagmi": "^1.8.8",
     "@reown/appkit-wallet-button": "^1.8.8",

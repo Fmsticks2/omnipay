@@ -2,6 +2,9 @@
 
 import Link from "next/link"
 import { AppKitButton } from "@reown/appkit/react"
+import dynamic from "next/dynamic"
+
+const PushChainConnect = dynamic(() => import("./pushchain-kit"), { ssr: false })
 import { useAppKitWallet } from "@reown/appkit-wallet-button/react"
 import { useAccount } from "wagmi"
 
@@ -23,6 +26,9 @@ export default function Home() {
         <p className="mt-2 text-sm sm:text-base text-neutral-600">Universal Cross‑Chain Payments</p>
 
         <div className="mt-6 flex items-center justify-center gap-4 flex-wrap">
+          {/* Push Chain UI Kit connect (renders when kit provides components) */}
+          <PushChainConnect />
+          {/* Existing AppKit universal connect */}
           <AppKitButton />
           <Link
             className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-5"
