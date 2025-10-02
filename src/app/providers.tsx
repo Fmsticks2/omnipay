@@ -26,7 +26,7 @@ const baseNetworks = [mainnet, arbitrum, base, polygon]
 const pushRpc = process.env.NEXT_PUBLIC_PUSHCHAIN_RPC_URL
 const pushChainId = process.env.NEXT_PUBLIC_PUSHCHAIN_CHAIN_ID
 const pushExplorer = process.env.NEXT_PUBLIC_PUSHCHAIN_EXPLORER_URL
-const pushName = process.env.NEXT_PUBLIC_PUSHCHAIN_NAME || "Push Chain Testnet"
+const pushName = process.env.NEXT_PUBLIC_PUSHCHAIN_NAME || "Push Testnet Donut"
 const pushSymbol = process.env.NEXT_PUBLIC_PUSHCHAIN_SYMBOL || "PUSH"
 
 let networks: any[] = baseNetworks
