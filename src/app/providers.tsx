@@ -20,8 +20,29 @@ const metadata = {
   icons: ["/next.svg"],
 }
 
-// Define EVM networks for MVP
-const networks = [mainnet, arbitrum, base, polygon]
+// Define EVM networks and conditionally add Push Chain Testnet via env
+const baseNetworks = [mainnet, arbitrum, base, polygon]
+
+const pushRpc = process.env.NEXT_PUBLIC_PUSHCHAIN_RPC_URL
+const pushChainId = process.env.NEXT_PUBLIC_PUSHCHAIN_CHAIN_ID
+const pushExplorer = process.env.NEXT_PUBLIC_PUSHCHAIN_EXPLORER_URL
+const pushName = process.env.NEXT_PUBLIC_PUSHCHAIN_NAME || "Push Chain Testnet"
+const pushSymbol = process.env.NEXT_PUBLIC_PUSHCHAIN_SYMBOL || "PUSH"
+
+let networks: any[] = baseNetworks
+
+if (pushRpc && pushChainId) {
+  const pushChainTestnet: any = {
+    id: Number(pushChainId),
+    name: pushName,
+    nativeCurrency: { name: pushSymbol, symbol: pushSymbol, decimals: 18 },
+    rpcUrls: { default: { http: [pushRpc] } },
+    ...(pushExplorer
+      ? { blockExplorers: { default: { name: "Explorer", url: pushExplorer } } }
+      : {}),
+  }
+  networks = [...baseNetworks, pushChainTestnet]
+}
 
 // Create Wagmi Adapter
 const wagmiAdapter = new WagmiAdapter({
