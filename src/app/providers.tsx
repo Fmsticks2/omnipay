@@ -23,11 +23,17 @@ const metadata = {
 // Define EVM networks and conditionally add Push Chain Testnet via env
 const baseNetworks = [mainnet, arbitrum, base, polygon]
 
-const pushRpc = process.env.NEXT_PUBLIC_PUSHCHAIN_RPC_URL
-const pushChainId = process.env.NEXT_PUBLIC_PUSHCHAIN_CHAIN_ID
-const pushExplorer = process.env.NEXT_PUBLIC_PUSHCHAIN_EXPLORER_URL
+const pushRpc = process.env.NEXT_PUBLIC_PUSHCHAIN_RPC_URL || "https://evm.rpc-testnet-donut-node1.push.org"
+const pushChainId = process.env.NEXT_PUBLIC_PUSHCHAIN_CHAIN_ID || "42101"
+const pushExplorer = process.env.NEXT_PUBLIC_PUSHCHAIN_EXPLORER_URL || "https://testnet-explorer.push.org"
 const pushName = process.env.NEXT_PUBLIC_PUSHCHAIN_NAME || "Push Testnet Donut"
-const pushSymbol = process.env.NEXT_PUBLIC_PUSHCHAIN_SYMBOL || "PUSH"
+const pushSymbol = process.env.NEXT_PUBLIC_PUSHCHAIN_SYMBOL || "PC"
+
+// OmniPay contract addresses
+const omniPayNotifier = process.env.NEXT_PUBLIC_OMNIPAY_NOTIFIER || "0xdc6c396319895dA489b0Cd145A4c5D660b9e10F6"
+const omniPayCore = process.env.NEXT_PUBLIC_OMNIPAY_CORE || "0xB6EE67F0c15f949433d0e484F60f70f1828458e3"
+const omniPaySubscription = process.env.NEXT_PUBLIC_OMNIPAY_SUBSCRIPTION || "0x72CA2541A705468368F9474fB419Defd002EC8af"
+const omniPayBridge = process.env.NEXT_PUBLIC_OMNIPAY_BRIDGE || "0xF565086417Bf8ba76e4FaFC9F0088818eA027539"
 
 let networks: any[] = baseNetworks
 

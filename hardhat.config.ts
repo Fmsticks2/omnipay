@@ -15,8 +15,9 @@ const config: HardhatUserConfig = {
   },
   networks: {
     push_donut: {
-      url: "https://donut.push.network/",
+      url: "https://evm.rpc-testnet-donut-node1.push.org",
       accounts: PRIVATE_KEY ? [PRIVATE_KEY] : [],
+      chainId: 42101,
     },
   },
 };

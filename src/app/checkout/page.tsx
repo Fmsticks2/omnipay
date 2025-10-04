@@ -6,12 +6,14 @@ import { useState, useMemo } from "react"
 import { parseUnits, isAddress } from "viem"
 import { ERC20_ABI } from "../../lib/erc20"
 import { motion } from "framer-motion"
+import { getContractAddresses, CHAIN_ID_TO_NETWORK } from "../../lib/contracts"
 
 const CHAIN_IDS: Record<string, number> = {
   ethereum: 1,
   base: 8453,
   polygon: 137,
   arbitrum: 42161,
+  push_donut: 42101,
 }
 
 // Token addresses (Base only for MVP)
@@ -32,8 +34,16 @@ export default function CheckoutPage() {
   const [amount, setAmount] = useState("")
   const [recipient, setRecipient] = useState("")
   const [status, setStatus] = useState<{ type: "success" | "error" | "info"; message: string } | null>(null)
-
-  const settlementSpender = process.env.NEXT_PUBLIC_SETTLEMENT_SPENDER as `0x${string}` | undefined
+  
+  // Get OmniPay contract addresses based on chain ID
+  const omnipayAddresses = useMemo(() => {
+    return getContractAddresses(chainId)
+  }, [chainId])
+  
+  // Use OmniPayCore as the settlement spender when available
+  const settlementSpender = useMemo(() => {
+    return omnipayAddresses?.CORE as `0x${string}` || process.env.NEXT_PUBLIC_SETTLEMENT_SPENDER as `0x${string}` | undefined
+  }, [omnipayAddresses])
 
   const selectedChainId = CHAIN_IDS[chain]
   const requiresSwitch = isConnected && selectedChainId && chainId !== selectedChainId
@@ -102,9 +112,38 @@ export default function CheckoutPage() {
     if (!canPay) return
     setStatus({ type: "info", message: "Submitting transaction..." })
     try {
+      // Generate a unique order ID
+      const orderId = `order-${Date.now()}-${Math.floor(Math.random() * 1000)}`
+      
+      // Check if we're on Push Chain and have OmniPay contracts available
+      const useOmniPay = omnipayAddresses && chainId === CHAIN_IDS.push_donut
+      
       if (token === "ETH") {
-        // Native transfer on selected chain
-        await sendTransactionAsync({ to: recipient as `0x${string}`, value: amountUnits })
+        if (useOmniPay) {
+          // Use OmniPay Core for ETH payments on Push Chain
+          await writeContractAsync({
+            address: omnipayAddresses.CORE as `0x${string}`,
+            // Simple ABI for payETH function
+            abi: [
+              {
+                inputs: [
+                  { name: "recipient", type: "address" },
+                  { name: "orderId", type: "string" }
+                ],
+                name: "payETH",
+                outputs: [],
+                stateMutability: "payable",
+                type: "function"
+              }
+            ],
+            functionName: "payETH",
+            args: [recipient as `0x${string}`, orderId],
+            value: amountUnits
+          })
+        } else {
+          // Native transfer on other chains
+          await sendTransactionAsync({ to: recipient as `0x${string}`, value: amountUnits })
+        }
         setStatus({ type: "success", message: "Payment sent: ETH" })
         return
       }
@@ -125,13 +164,37 @@ export default function CheckoutPage() {
         }
       }
 
-      // Direct transfer to recipient (merchant)
-      await writeContractAsync({
-        abi: ERC20_ABI,
-        address: tokenAddress,
-        functionName: "transfer",
-        args: [recipient as `0x${string}`, amountUnits],
-      })
+      if (useOmniPay) {
+        // Use OmniPay Core for ERC20 payments on Push Chain
+        await writeContractAsync({
+          address: omnipayAddresses.CORE as `0x${string}`,
+          // Simple ABI for payERC20 function
+          abi: [
+            {
+              inputs: [
+                { name: "token", type: "address" },
+                { name: "recipient", type: "address" },
+                { name: "amount", type: "uint256" },
+                { name: "orderId", type: "string" }
+              ],
+              name: "payERC20",
+              outputs: [],
+              stateMutability: "nonpayable",
+              type: "function"
+            }
+          ],
+          functionName: "payERC20",
+          args: [tokenAddress, recipient as `0x${string}`, amountUnits, orderId]
+        })
+      } else {
+        // Direct transfer to recipient (merchant) on other chains
+        await writeContractAsync({
+          abi: ERC20_ABI,
+          address: tokenAddress,
+          functionName: "transfer",
+          args: [recipient as `0x${string}`, amountUnits],
+        })
+      }
 
       setStatus({ type: "success", message: `Payment sent: ${amount} ${token} on ${chain}` })
     } catch (err) {
