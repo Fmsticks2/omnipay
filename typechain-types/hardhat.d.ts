@@ -38,6 +38,18 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.TestERC20__factory>;
     getContractFactory(
+      name: "IOmniPayNotifier",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IOmniPayNotifier__factory>;
+    getContractFactory(
+      name: "IPushCommInterface",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IPushCommInterface__factory>;
+    getContractFactory(
+      name: "OmniPayBridge",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.OmniPayBridge__factory>;
+    getContractFactory(
       name: "OmniPayBridgeStub",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.OmniPayBridgeStub__factory>;
@@ -57,6 +69,14 @@ declare module "hardhat/types/runtime" {
       name: "OmniPayNotifier",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.OmniPayNotifier__factory>;
+    getContractFactory(
+      name: "IOmniPayNotifier",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IOmniPayNotifier__factory>;
+    getContractFactory(
+      name: "OmniPaySettlement",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.OmniPaySettlement__factory>;
     getContractFactory(
       name: "IOmniPayNotifierSub",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -97,6 +117,21 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.TestERC20>;
     getContractAt(
+      name: "IOmniPayNotifier",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IOmniPayNotifier>;
+    getContractAt(
+      name: "IPushCommInterface",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IPushCommInterface>;
+    getContractAt(
+      name: "OmniPayBridge",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.OmniPayBridge>;
+    getContractAt(
       name: "OmniPayBridgeStub",
       address: string | ethers.Addressable,
       signer?: ethers.Signer
@@ -121,6 +156,16 @@ declare module "hardhat/types/runtime" {
       address: string | ethers.Addressable,
       signer?: ethers.Signer
     ): Promise<Contracts.OmniPayNotifier>;
+    getContractAt(
+      name: "IOmniPayNotifier",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IOmniPayNotifier>;
+    getContractAt(
+      name: "OmniPaySettlement",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.OmniPaySettlement>;
     getContractAt(
       name: "IOmniPayNotifierSub",
       address: string | ethers.Addressable,
@@ -157,6 +202,18 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.TestERC20>;
     deployContract(
+      name: "IOmniPayNotifier",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IOmniPayNotifier>;
+    deployContract(
+      name: "IPushCommInterface",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IPushCommInterface>;
+    deployContract(
+      name: "OmniPayBridge",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.OmniPayBridge>;
+    deployContract(
       name: "OmniPayBridgeStub",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.OmniPayBridgeStub>;
@@ -176,6 +233,14 @@ declare module "hardhat/types/runtime" {
       name: "OmniPayNotifier",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.OmniPayNotifier>;
+    deployContract(
+      name: "IOmniPayNotifier",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IOmniPayNotifier>;
+    deployContract(
+      name: "OmniPaySettlement",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.OmniPaySettlement>;
     deployContract(
       name: "IOmniPayNotifierSub",
       signerOrOptions?: ethers.Signer | DeployContractOptions
@@ -216,6 +281,21 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.TestERC20>;
     deployContract(
+      name: "IOmniPayNotifier",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IOmniPayNotifier>;
+    deployContract(
+      name: "IPushCommInterface",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IPushCommInterface>;
+    deployContract(
+      name: "OmniPayBridge",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.OmniPayBridge>;
+    deployContract(
       name: "OmniPayBridgeStub",
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
@@ -240,6 +320,16 @@ declare module "hardhat/types/runtime" {
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.OmniPayNotifier>;
+    deployContract(
+      name: "IOmniPayNotifier",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IOmniPayNotifier>;
+    deployContract(
+      name: "OmniPaySettlement",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.OmniPaySettlement>;
     deployContract(
       name: "IOmniPayNotifierSub",
       args: any[],

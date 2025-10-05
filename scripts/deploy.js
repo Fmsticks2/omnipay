@@ -27,11 +27,36 @@ async function main() {
   await subscription.waitForDeployment();
   console.log(`OmniPaySubscription: ${await subscription.getAddress()}`);
 
-  // Deploy Bridge Stub
-  const Bridge = await hre.ethers.getContractFactory("OmniPayBridgeStub");
-  const bridge = await Bridge.deploy();
+  // Deploy Settlement
+  const Settlement = await hre.ethers.getContractFactory("OmniPaySettlement");
+  const settlement = await Settlement.deploy(await notifier.getAddress());
+  await settlement.waitForDeployment();
+  console.log(`OmniPaySettlement: ${await settlement.getAddress()}`);
+
+  // Deploy Bridge (real implementation, not stub)
+  const Bridge = await hre.ethers.getContractFactory("OmniPayBridge");
+  const bridge = await Bridge.deploy(
+    await notifier.getAddress(),
+    PUSH_COMM,
+    PUSH_CHANNEL
+  );
   await bridge.waitForDeployment();
-  console.log(`OmniPayBridgeStub: ${await bridge.getAddress()}`);
+  console.log(`OmniPayBridge: ${await bridge.getAddress()}`);
+
+  // Deploy Bridge Stub (for testing/fallback)
+  const BridgeStub = await hre.ethers.getContractFactory("OmniPayBridgeStub");
+  const bridgeStub = await BridgeStub.deploy();
+  await bridgeStub.waitForDeployment();
+  console.log(`OmniPayBridgeStub: ${await bridgeStub.getAddress()}`);
+
+  console.log("\n=== Deployment Summary ===");
+  console.log(`Network: ${(await deployer.provider.getNetwork()).name}`);
+  console.log(`OmniPayNotifier: ${await notifier.getAddress()}`);
+  console.log(`OmniPayCore: ${await core.getAddress()}`);
+  console.log(`OmniPaySubscription: ${await subscription.getAddress()}`);
+  console.log(`OmniPaySettlement: ${await settlement.getAddress()}`);
+  console.log(`OmniPayBridge: ${await bridge.getAddress()}`);
+  console.log(`OmniPayBridgeStub: ${await bridgeStub.getAddress()}`);
 }
 
 main().catch((error) => {

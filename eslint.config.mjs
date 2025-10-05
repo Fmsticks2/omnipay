@@ -10,14 +10,15 @@ const compat = new FlatCompat({
 });
 
 const eslintConfig = [
-  ...compat.extends("next/core-web-vitals", "next/typescript"),
+  ...compat.extends("@eslint/recommended", "@typescript-eslint/recommended"),
   {
     ignores: [
       "node_modules/**",
-      ".next/**",
-      "out/**",
+      "dist/**",
       "build/**",
-      "next-env.d.ts",
+      "artifacts/**",
+      "cache/**",
+      "typechain-types/**",
     ],
   },
 ];

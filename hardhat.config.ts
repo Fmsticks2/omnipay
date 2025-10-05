@@ -20,6 +20,10 @@ const config: HardhatUserConfig = {
       chainId: 42101,
     },
   },
+  typechain: {
+    outDir: "typechain-types",
+    target: "ethers-v6",
+  },
 };
 
 export default config;

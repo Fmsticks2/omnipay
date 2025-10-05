@@ -1,5 +1,3 @@
-"use client"
-
 import { useEffect, useState } from "react"
 
 // Minimal integration shim for @pushchain/ui-kit without relying on undocumented APIs.
