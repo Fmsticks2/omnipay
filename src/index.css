@@ -41,12 +41,21 @@ html {
   100% { background-position: 200% 0; }
 }
 
+@keyframes gradient-x {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
 .animate-float {
   animation: float 3s ease-in-out infinite;
 }
 
 .animate-glow {
   animation: glow 2s ease-in-out infinite;
+}
+
+.animate-gradient-x {
+  animation: gradient-x 3s ease infinite;
 }
 
 .animate-shimmer {
