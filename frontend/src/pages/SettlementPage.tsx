@@ -1,11 +1,13 @@
 import { motion } from 'framer-motion';
 import { useState } from 'react';
+import { useAccount } from 'wagmi';
 import type { FunctionComponent } from '../common/types';
 import Layout from '../components/layout/Layout';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 
 const SettlementPage = (): FunctionComponent => {
+  const { address, isConnected } = useAccount();
   const [activeTab, setActiveTab] = useState<'create' | 'manage'>('create');
   const [recipients, setRecipients] = useState([
     { address: '', amount: '', token: 'ETH' }
@@ -40,9 +42,23 @@ const SettlementPage = (): FunctionComponent => {
     });
   };
 
-  const handleCreateSettlement = () => {
-    // TODO: Implement settlement creation with wagmi/viem
-    console.log('Creating settlement:', { settlementData, recipients });
+  const handleCreateSettlement = async () => {
+    if (!isConnected || !address) return;
+    
+    try {
+      // TODO: Implement real settlement creation with wagmi/viem
+      console.log('Creating settlement:', { settlementData, recipients });
+      
+      // This should call the actual smart contract
+      // await writeContract({
+      //   address: OMNIPAY_CONTRACTS.SETTLEMENT,
+      //   abi: CONTRACT_ABIS.SETTLEMENT,
+      //   functionName: 'createSettlement',
+      //   args: [...]
+      // });
+    } catch (err) {
+      console.error('Settlement creation failed:', err);
+    }
   };
 
   const mockSettlements = [

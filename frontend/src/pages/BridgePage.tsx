@@ -57,9 +57,9 @@ const SUPPORTED_CHAINS = {
 };
 
 const BridgePage = (): FunctionComponent => {
-  const { address, isConnected } = useAccount();
-  const { writeContract, data: hash } = useWriteContract();
-  const { isSuccess } = useWaitForTransactionReceipt({
+  const { address, isConnected, chain } = useAccount();
+  const { writeContract, data: hash, isPending: isWritePending } = useWriteContract();
+  const { isSuccess, isLoading: isConfirming } = useWaitForTransactionReceipt({
     hash,
   });
 
@@ -113,6 +113,11 @@ const BridgePage = (): FunctionComponent => {
     try {
       setBridgeStep('processing');
       
+      // Check if we're on the correct network (Push Testnet)
+      if (!chain || chain.id !== 42101) {
+        throw new Error('Please switch to Push Testnet (Chain ID: 42101) to use the bridge');
+      }
+      
       await writeContract({
         address: OMNIPAY_CONTRACTS.BRIDGE,
         abi: CONTRACT_ABIS.BRIDGE,
@@ -122,7 +127,7 @@ const BridgePage = (): FunctionComponent => {
           parseEther(formData.amount),
           '0x0000000000000000000000000000000000000000' as `0x${string}`, // ETH
           formData.message,
-          BigInt(1), // target chain ID - should be dynamic
+          BigInt(1), // target chain ID - should be dynamic based on formData.targetChain
         ],
         value: parseEther(formData.amount),
       });
@@ -137,32 +142,18 @@ const BridgePage = (): FunctionComponent => {
     setBridgeStep('complete');
   }
 
-  // Mock transaction data with Push Protocol examples
-  const mockTransactions = [
-    {
-      id: '0x1234...5678',
-      from: 'Push Protocol Testnet',
-      to: 'Sepolia Testnet',
-      amount: '100 PUSH',
-      status: 'completed',
-      timestamp: '2024-10-06 14:30'
-    },
-    {
-      id: '0xabcd...efgh',
-      from: 'Sepolia Testnet',
-      to: 'Push Protocol Testnet',
-      amount: '0.5 ETH',
-      status: 'pending',
-      timestamp: '2024-10-06 13:15'
-    },
-    {
-      id: '0x9876...5432',
-      from: 'Ethereum',
-      to: 'Polygon',
-      amount: '1000 USDC',
-      status: 'completed',
-      timestamp: '2024-10-06 12:45'
-    }
+  // TODO: Replace with real transaction data from contract events
+  const recentTransactions: any[] = [];[
+    // This should be fetched from the bridge contract's transaction history
+    // Example structure for when real data is available:
+    // {
+    //   id: hash,
+    //   from: sourceChain,
+    //   to: targetChain,
+    //   amount: amount + ' ' + token,
+    //   status: status,
+    //   timestamp: timestamp
+    // }
   ];
 
   if (bridgeStep === 'confirm') {
@@ -477,8 +468,16 @@ const BridgePage = (): FunctionComponent => {
                     className="w-full"
                     size="lg"
                     variant="secondary"
+                    disabled={isWritePending || isConfirming}
                   >
-                    Bridge Assets
+                    {isWritePending || isConfirming ? (
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        Processing...
+                      </div>
+                    ) : (
+                      'Bridge Assets'
+                    )}
                   </Button>
                 </Card>
               </motion.div>
@@ -539,22 +538,28 @@ const BridgePage = (): FunctionComponent => {
                 <Card>
                   <h3 className="text-xl font-bold text-white mb-4">Recent Bridge Transactions</h3>
                   <div className="space-y-3">
-                    {mockTransactions.map((tx) => (
-                      <div key={tx.id} className="p-4 bg-white/5 rounded-lg">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-white font-medium">{tx.amount}</span>
-                          <span className={`px-2 py-1 rounded-full text-xs ${
-                            tx.status === 'completed' 
-                              ? 'bg-green-500/20 text-green-400' 
-                              : 'bg-yellow-500/20 text-yellow-400'
-                          }`}>
-                            {tx.status}
-                          </span>
+                    {recentTransactions.length === 0 ? (
+                      <p className="text-gray-400 text-center py-4">No recent transactions</p>
+                    ) : (
+                      recentTransactions.map((tx) => (
+                        <div key={tx.id} className="p-4 bg-white/5 rounded-lg border border-white/10">
+                          <div className="flex justify-between items-start mb-2">
+                            <span className="text-white font-medium">{tx.amount}</span>
+                            <span className={`px-2 py-1 rounded-full text-xs ${
+                              tx.status === 'completed' 
+                                ? 'bg-green-500/20 text-green-400' 
+                                : tx.status === 'pending'
+                                ? 'bg-yellow-500/20 text-yellow-400'
+                                : 'bg-red-500/20 text-red-400'
+                            }`}>
+                              {tx.status}
+                            </span>
+                          </div>
+                          <p className="text-gray-400 text-sm">{tx.from} → {tx.to}</p>
+                          <p className="text-gray-500 text-xs mt-1">{tx.timestamp}</p>
                         </div>
-                        <p className="text-gray-400 text-sm">{tx.from} → {tx.to}</p>
-                        <p className="text-gray-500 text-xs mt-1">{tx.timestamp}</p>
-                      </div>
-                    ))}
+                      ))
+                    )}
                   </div>
                 </Card>
               </motion.div>

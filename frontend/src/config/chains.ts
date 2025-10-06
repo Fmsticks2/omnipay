@@ -1,9 +1,8 @@
 import { mainnet, polygon, optimism, arbitrum, base } from 'wagmi/chains';
-import { NETWORK_CONFIG } from './contracts';
 
-// Define the Push testnet network
+// Define the Push testnet network with correct chain ID
 export const pushTestnet = {
-  id: NETWORK_CONFIG.chainId,
+  id: 42101, // Push Protocol Testnet Donut chain ID
   name: 'Push Testnet Donut',
   nativeCurrency: {
     decimals: 18,
@@ -24,49 +23,49 @@ export const pushTestnet = {
   testnet: true,
 } as const;
 
-// All supported chains for OmniPay
+// All supported chains for OmniPay with correct chain IDs
 export const supportedChains = [
-  pushTestnet,
-  mainnet,
-  polygon,
-  optimism,
-  arbitrum,
-  base,
+  pushTestnet,    // Chain ID: 42101
+  mainnet,        // Chain ID: 1 (Ethereum Mainnet)
+  polygon,        // Chain ID: 137 (Polygon Mainnet)
+  optimism,       // Chain ID: 10 (Optimism Mainnet)
+  arbitrum,       // Chain ID: 42161 (Arbitrum One)
+  base,           // Chain ID: 8453 (Base Mainnet)
 ] as const;
 
-// Chain metadata for UI display
+// Chain metadata for UI display with correct chain IDs
 export const chainMetadata = {
-  [mainnet.id]: {
+  1: { // Ethereum Mainnet
     name: 'Ethereum',
     shortName: 'ETH',
     color: '#627EEA',
     logo: '🔷',
   },
-  [polygon.id]: {
+  137: { // Polygon Mainnet
     name: 'Polygon',
     shortName: 'MATIC',
     color: '#8247E5',
     logo: '🟣',
   },
-  [optimism.id]: {
+  10: { // Optimism Mainnet
     name: 'Optimism',
     shortName: 'OP',
     color: '#FF0420',
     logo: '🔴',
   },
-  [arbitrum.id]: {
+  42161: { // Arbitrum One
     name: 'Arbitrum',
     shortName: 'ARB',
     color: '#28A0F0',
     logo: '🔵',
   },
-  [base.id]: {
+  8453: { // Base Mainnet
     name: 'Base',
     shortName: 'BASE',
     color: '#0052FF',
     logo: '🔵',
   },
-  [pushTestnet.id]: {
+  42101: { // Push Protocol Testnet Donut
     name: 'Push Testnet',
     shortName: 'PUSH',
     color: '#E91E63',
