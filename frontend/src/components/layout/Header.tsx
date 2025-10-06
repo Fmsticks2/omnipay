@@ -12,10 +12,10 @@ const Header = (): FunctionComponent => {
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
-        className="backdrop-blur-md border border-white/10 rounded-2xl max-w-6xl w-full"
+        className="backdrop-blur-md border border-white/10 rounded-2xl max-w-7xl w-full"
         style={{ backgroundColor: '#060011' }}
       >
-        <div className="px-6 py-4">
+        <div className="px-8 py-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
           <motion.div
@@ -33,7 +33,7 @@ const Header = (): FunctionComponent => {
           </motion.div>
 
           {/* Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
+          <nav className="hidden md:flex items-center space-x-6 flex-1 justify-center max-w-2xl">
             <Link
               to="/"
               className="flex items-center space-x-2 text-white/80 hover:text-white transition-colors duration-200 font-medium"
@@ -72,7 +72,7 @@ const Header = (): FunctionComponent => {
           </nav>
 
           {/* Wallet Connection */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-4 min-w-0 flex-shrink-0">
             <ConnectButton />
           </div>
         </div>
