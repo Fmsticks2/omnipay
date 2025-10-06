@@ -6,7 +6,8 @@ import type { FunctionComponent } from '../common/types';
 import Layout from '../components/layout/Layout';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
-import Icon, { ChainIcon, UI_ICONS } from '../components/ui/Icon';
+import Icon, { ChainIcon } from '../components/ui/Icon';
+import { UI_ICONS, CHAIN_ICONS } from '../components/ui/iconConstants';
 import { useCreateSubscription } from '../hooks/useOmniPayContracts';
 import { getChainMetadata } from '../config/chains';
 
@@ -115,7 +116,7 @@ const SubscriptionsPage = (): FunctionComponent => {
                 <div className="flex items-center space-x-2">
                   {chainMetadata && (
                     <ChainIcon 
-                      chain={chainMetadata.name.toLowerCase() as keyof typeof import('../components/ui/Icon').CHAIN_ICONS} 
+                      chain={chainMetadata.name.toLowerCase() as keyof typeof CHAIN_ICONS} 
                       size={20} 
                     />
                   )}

@@ -4,7 +4,8 @@ import { ConnectButton } from '@rainbow-me/rainbowkit';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 import Layout from '../components/layout/Layout';
-import Icon, { TokenIcon, ChainIcon, UI_ICONS, TOKEN_ICONS } from '../components/ui/Icon';
+import Icon, { TokenIcon, ChainIcon } from '../components/ui/Icon';
+import { UI_ICONS, TOKEN_ICONS, CHAIN_ICONS } from '../components/ui/iconConstants';
 import { useSendPayment } from '../hooks/useOmniPayContracts';
 import { SUPPORTED_TOKENS } from '../config/contracts';
 import { getChainMetadata } from '../config/chains';
@@ -77,7 +78,7 @@ export default function PaymentsPage() {
               <div className="flex items-center space-x-2 mb-2">
                 {chainMetadata && (
                   <ChainIcon 
-                    chain={chainMetadata.name.toLowerCase() as keyof typeof import('../components/ui/Icon').CHAIN_ICONS} 
+                    chain={chainMetadata.name.toLowerCase() as keyof typeof CHAIN_ICONS} 
                     size={20} 
                   />
                 )}
@@ -265,7 +266,7 @@ export default function PaymentsPage() {
                   <div className="flex items-center space-x-2">
                     {chainMetadata && (
                       <ChainIcon 
-                        chain={chainMetadata.name.toLowerCase() as keyof typeof import('../components/ui/Icon').CHAIN_ICONS} 
+                        chain={chainMetadata.name.toLowerCase() as keyof typeof CHAIN_ICONS} 
                         size={20} 
                       />
                     )}

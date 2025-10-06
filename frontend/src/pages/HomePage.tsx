@@ -4,7 +4,8 @@ import Layout from '../components/layout/Layout';
 import Hero from '../components/ui/Hero';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
-import Icon, { UI_ICONS } from '../components/ui/Icon';
+import Icon from '../components/ui/Icon';
+import { UI_ICONS } from '../components/ui/iconConstants';
 
 const HomePage = (): FunctionComponent => {
   return (

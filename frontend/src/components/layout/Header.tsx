@@ -2,7 +2,8 @@ import { motion } from 'framer-motion';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { Link } from '@tanstack/react-router';
 import type { FunctionComponent } from '../../common/types';
-import Icon, { UI_ICONS } from '../ui/Icon';
+import Icon from '../ui/Icon';
+import { UI_ICONS } from '../ui/iconConstants';
 
 const Header = (): FunctionComponent => {
   return (

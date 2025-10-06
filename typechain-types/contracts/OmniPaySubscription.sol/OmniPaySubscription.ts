@@ -44,6 +44,7 @@ export interface OmniPaySubscriptionInterface extends Interface {
       | "SubscriptionCancelled"
       | "SubscriptionCreated"
       | "SubscriptionExecuted"
+      | "SubscriptionFailed"
   ): EventFragment;
 
   encodeFunctionData(
@@ -200,6 +201,37 @@ export namespace SubscriptionExecutedEvent {
     token: string;
     amount: bigint;
     nextPaymentDue: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace SubscriptionFailedEvent {
+  export type InputTuple = [
+    id: BigNumberish,
+    subscriber: AddressLike,
+    merchant: AddressLike,
+    token: AddressLike,
+    amount: BigNumberish,
+    reason: string
+  ];
+  export type OutputTuple = [
+    id: bigint,
+    subscriber: string,
+    merchant: string,
+    token: string,
+    amount: bigint,
+    reason: string
+  ];
+  export interface OutputObject {
+    id: bigint;
+    subscriber: string;
+    merchant: string;
+    token: string;
+    amount: bigint;
+    reason: string;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -397,6 +429,13 @@ export interface OmniPaySubscription extends BaseContract {
     SubscriptionExecutedEvent.OutputTuple,
     SubscriptionExecutedEvent.OutputObject
   >;
+  getEvent(
+    key: "SubscriptionFailed"
+  ): TypedContractEvent<
+    SubscriptionFailedEvent.InputTuple,
+    SubscriptionFailedEvent.OutputTuple,
+    SubscriptionFailedEvent.OutputObject
+  >;
 
   filters: {
     "OwnershipTransferred(address,address)": TypedContractEvent<
@@ -441,6 +480,17 @@ export interface OmniPaySubscription extends BaseContract {
       SubscriptionExecutedEvent.InputTuple,
       SubscriptionExecutedEvent.OutputTuple,
       SubscriptionExecutedEvent.OutputObject
+    >;
+
+    "SubscriptionFailed(uint256,address,address,address,uint256,string)": TypedContractEvent<
+      SubscriptionFailedEvent.InputTuple,
+      SubscriptionFailedEvent.OutputTuple,
+      SubscriptionFailedEvent.OutputObject
+    >;
+    SubscriptionFailed: TypedContractEvent<
+      SubscriptionFailedEvent.InputTuple,
+      SubscriptionFailedEvent.OutputTuple,
+      SubscriptionFailedEvent.OutputObject
     >;
   };
 }

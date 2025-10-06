@@ -2,11 +2,32 @@
 pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
-interface IOmniPayNotifierSub {
+/**
+ * @title IOmniPayNotifier
+ * @notice Interface for payment notification callbacks
+ */
+interface IOmniPayNotifier {
+    function notifyPaymentSuccess(
+        address payer,
+        address payee,
+        address token,
+        uint256 amount,
+        string calldata paymentRef
+    ) external;
+
+    function notifyPaymentFailure(
+        address payer,
+        address payee,
+        address token,
+        uint256 amount,
+        string calldata paymentRef,
+        string calldata reason
+    ) external;
+
     function notifySubscriptionExecuted(
         uint256 subId,
         address subscriber,
@@ -51,12 +72,21 @@ contract OmniPaySubscription is Ownable, ReentrancyGuard {
         uint256 nextPaymentDue
     );
     event SubscriptionCancelled(uint256 indexed id, address indexed subscriber, address indexed merchant);
+    
+    event SubscriptionFailed(
+        uint256 indexed id,
+        address indexed subscriber,
+        address indexed merchant,
+        address token,
+        uint256 amount,
+        string reason
+    );
 
     uint256 public nextId = 1;
     mapping(uint256 => Subscription) public subscriptions;
     address public notifier;
 
-    constructor(address _notifier) {
+    constructor(address _notifier) Ownable(msg.sender) {
         notifier = _notifier;
     }
 
@@ -114,7 +144,7 @@ contract OmniPaySubscription is Ownable, ReentrancyGuard {
         emit SubscriptionExecuted(id, s.subscriber, s.merchant, s.token, s.amount, s.nextPaymentDue);
 
         if (notifier != address(0)) {
-            try IOmniPayNotifierSub(notifier).notifySubscriptionExecuted(
+            try IOmniPayNotifier(notifier).notifySubscriptionExecuted(
                 id,
                 s.subscriber,
                 s.merchant,
@@ -137,7 +167,7 @@ contract OmniPaySubscription is Ownable, ReentrancyGuard {
         emit SubscriptionCancelled(id, s.subscriber, s.merchant);
 
         if (notifier != address(0)) {
-            try IOmniPayNotifierSub(notifier).notifySubscriptionCancelled(id, s.subscriber, s.merchant) {} catch {}
+            try IOmniPayNotifier(notifier).notifySubscriptionCancelled(id, s.subscriber, s.merchant) {} catch {}
         }
     }
 }

@@ -23,12 +23,60 @@ import type {
   TypedContractMethod,
 } from "../common";
 
+export declare namespace OmniPayBridgeStub {
+  export type CrossChainTransactionStruct = {
+    localTxId: BigNumberish;
+    payer: AddressLike;
+    payee: AddressLike;
+    token: AddressLike;
+    amount: BigNumberish;
+    chain: string;
+    paymentRef: string;
+    timestamp: BigNumberish;
+    status: BigNumberish;
+  };
+
+  export type CrossChainTransactionStructOutput = [
+    localTxId: bigint,
+    payer: string,
+    payee: string,
+    token: string,
+    amount: bigint,
+    chain: string,
+    paymentRef: string,
+    timestamp: bigint,
+    status: bigint
+  ] & {
+    localTxId: bigint;
+    payer: string;
+    payee: string;
+    token: string;
+    amount: bigint;
+    chain: string;
+    paymentRef: string;
+    timestamp: bigint;
+    status: bigint;
+  };
+}
+
 export interface OmniPayBridgeStubInterface extends Interface {
   getFunction(
     nameOrSignature:
+      | "addOperator"
+      | "authorizedOperators"
       | "completeCrossChainPayment"
+      | "completedTransactions"
+      | "generateTransactionId"
+      | "getCompletedTransaction"
+      | "getInitiatedTransaction"
+      | "getTransactionStatus"
       | "initiateCrossChainPayment"
+      | "initiatedTransactions"
+      | "isOperator"
+      | "markTransactionFailed"
+      | "nextTransactionId"
       | "owner"
+      | "removeOperator"
       | "renounceOwnership"
       | "transferOwnership"
   ): FunctionFragment;
@@ -36,10 +84,21 @@ export interface OmniPayBridgeStubInterface extends Interface {
   getEvent(
     nameOrSignatureOrTopic:
       | "CrossChainPaymentCompleted"
+      | "CrossChainPaymentFailed"
       | "CrossChainPaymentInitiated"
+      | "OperatorAdded"
+      | "OperatorRemoved"
       | "OwnershipTransferred"
   ): EventFragment;
 
+  encodeFunctionData(
+    functionFragment: "addOperator",
+    values: [AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "authorizedOperators",
+    values: [AddressLike]
+  ): string;
   encodeFunctionData(
     functionFragment: "completeCrossChainPayment",
     values: [
@@ -53,6 +112,26 @@ export interface OmniPayBridgeStubInterface extends Interface {
     ]
   ): string;
   encodeFunctionData(
+    functionFragment: "completedTransactions",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "generateTransactionId",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getCompletedTransaction",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getInitiatedTransaction",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getTransactionStatus",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
     functionFragment: "initiateCrossChainPayment",
     values: [
       BigNumberish,
@@ -64,7 +143,27 @@ export interface OmniPayBridgeStubInterface extends Interface {
       string
     ]
   ): string;
+  encodeFunctionData(
+    functionFragment: "initiatedTransactions",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "isOperator",
+    values: [AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "markTransactionFailed",
+    values: [BigNumberish, string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "nextTransactionId",
+    values?: undefined
+  ): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "removeOperator",
+    values: [AddressLike]
+  ): string;
   encodeFunctionData(
     functionFragment: "renounceOwnership",
     values?: undefined
@@ -75,14 +174,59 @@ export interface OmniPayBridgeStubInterface extends Interface {
   ): string;
 
   decodeFunctionResult(
+    functionFragment: "addOperator",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "authorizedOperators",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "completeCrossChainPayment",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "completedTransactions",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "generateTransactionId",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getCompletedTransaction",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getInitiatedTransaction",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getTransactionStatus",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
     functionFragment: "initiateCrossChainPayment",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "initiatedTransactions",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "isOperator", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "markTransactionFailed",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "nextTransactionId",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "removeOperator",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "renounceOwnership",
     data: BytesLike
@@ -127,6 +271,34 @@ export namespace CrossChainPaymentCompletedEvent {
   export type LogDescription = TypedLogDescription<Event>;
 }
 
+export namespace CrossChainPaymentFailedEvent {
+  export type InputTuple = [
+    localTxId: BigNumberish,
+    payer: AddressLike,
+    payee: AddressLike,
+    chain: string,
+    reason: string
+  ];
+  export type OutputTuple = [
+    localTxId: bigint,
+    payer: string,
+    payee: string,
+    chain: string,
+    reason: string
+  ];
+  export interface OutputObject {
+    localTxId: bigint;
+    payer: string;
+    payee: string;
+    chain: string;
+    reason: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
 export namespace CrossChainPaymentInitiatedEvent {
   export type InputTuple = [
     localTxId: BigNumberish,
@@ -154,6 +326,30 @@ export namespace CrossChainPaymentInitiatedEvent {
     amount: bigint;
     targetChain: string;
     paymentRef: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace OperatorAddedEvent {
+  export type InputTuple = [operator: AddressLike];
+  export type OutputTuple = [operator: string];
+  export interface OutputObject {
+    operator: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace OperatorRemovedEvent {
+  export type InputTuple = [operator: AddressLike];
+  export type OutputTuple = [operator: string];
+  export interface OutputObject {
+    operator: string;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -217,6 +413,18 @@ export interface OmniPayBridgeStub extends BaseContract {
     event?: TCEvent
   ): Promise<this>;
 
+  addOperator: TypedContractMethod<
+    [operator: AddressLike],
+    [void],
+    "nonpayable"
+  >;
+
+  authorizedOperators: TypedContractMethod<
+    [arg0: AddressLike],
+    [boolean],
+    "view"
+  >;
+
   completeCrossChainPayment: TypedContractMethod<
     [
       localTxId: BigNumberish,
@@ -229,6 +437,54 @@ export interface OmniPayBridgeStub extends BaseContract {
     ],
     [void],
     "nonpayable"
+  >;
+
+  completedTransactions: TypedContractMethod<
+    [arg0: BigNumberish],
+    [
+      [
+        bigint,
+        string,
+        string,
+        string,
+        bigint,
+        string,
+        string,
+        bigint,
+        bigint
+      ] & {
+        localTxId: bigint;
+        payer: string;
+        payee: string;
+        token: string;
+        amount: bigint;
+        chain: string;
+        paymentRef: string;
+        timestamp: bigint;
+        status: bigint;
+      }
+    ],
+    "view"
+  >;
+
+  generateTransactionId: TypedContractMethod<[], [bigint], "nonpayable">;
+
+  getCompletedTransaction: TypedContractMethod<
+    [localTxId: BigNumberish],
+    [OmniPayBridgeStub.CrossChainTransactionStructOutput],
+    "view"
+  >;
+
+  getInitiatedTransaction: TypedContractMethod<
+    [localTxId: BigNumberish],
+    [OmniPayBridgeStub.CrossChainTransactionStructOutput],
+    "view"
+  >;
+
+  getTransactionStatus: TypedContractMethod<
+    [localTxId: BigNumberish],
+    [bigint],
+    "view"
   >;
 
   initiateCrossChainPayment: TypedContractMethod<
@@ -245,7 +501,51 @@ export interface OmniPayBridgeStub extends BaseContract {
     "nonpayable"
   >;
 
+  initiatedTransactions: TypedContractMethod<
+    [arg0: BigNumberish],
+    [
+      [
+        bigint,
+        string,
+        string,
+        string,
+        bigint,
+        string,
+        string,
+        bigint,
+        bigint
+      ] & {
+        localTxId: bigint;
+        payer: string;
+        payee: string;
+        token: string;
+        amount: bigint;
+        chain: string;
+        paymentRef: string;
+        timestamp: bigint;
+        status: bigint;
+      }
+    ],
+    "view"
+  >;
+
+  isOperator: TypedContractMethod<[operator: AddressLike], [boolean], "view">;
+
+  markTransactionFailed: TypedContractMethod<
+    [localTxId: BigNumberish, reason: string],
+    [void],
+    "nonpayable"
+  >;
+
+  nextTransactionId: TypedContractMethod<[], [bigint], "view">;
+
   owner: TypedContractMethod<[], [string], "view">;
+
+  removeOperator: TypedContractMethod<
+    [operator: AddressLike],
+    [void],
+    "nonpayable"
+  >;
 
   renounceOwnership: TypedContractMethod<[], [void], "nonpayable">;
 
@@ -259,6 +559,12 @@ export interface OmniPayBridgeStub extends BaseContract {
     key: string | FunctionFragment
   ): T;
 
+  getFunction(
+    nameOrSignature: "addOperator"
+  ): TypedContractMethod<[operator: AddressLike], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "authorizedOperators"
+  ): TypedContractMethod<[arg0: AddressLike], [boolean], "view">;
   getFunction(
     nameOrSignature: "completeCrossChainPayment"
   ): TypedContractMethod<
@@ -275,6 +581,55 @@ export interface OmniPayBridgeStub extends BaseContract {
     "nonpayable"
   >;
   getFunction(
+    nameOrSignature: "completedTransactions"
+  ): TypedContractMethod<
+    [arg0: BigNumberish],
+    [
+      [
+        bigint,
+        string,
+        string,
+        string,
+        bigint,
+        string,
+        string,
+        bigint,
+        bigint
+      ] & {
+        localTxId: bigint;
+        payer: string;
+        payee: string;
+        token: string;
+        amount: bigint;
+        chain: string;
+        paymentRef: string;
+        timestamp: bigint;
+        status: bigint;
+      }
+    ],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "generateTransactionId"
+  ): TypedContractMethod<[], [bigint], "nonpayable">;
+  getFunction(
+    nameOrSignature: "getCompletedTransaction"
+  ): TypedContractMethod<
+    [localTxId: BigNumberish],
+    [OmniPayBridgeStub.CrossChainTransactionStructOutput],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "getInitiatedTransaction"
+  ): TypedContractMethod<
+    [localTxId: BigNumberish],
+    [OmniPayBridgeStub.CrossChainTransactionStructOutput],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "getTransactionStatus"
+  ): TypedContractMethod<[localTxId: BigNumberish], [bigint], "view">;
+  getFunction(
     nameOrSignature: "initiateCrossChainPayment"
   ): TypedContractMethod<
     [
@@ -290,8 +645,53 @@ export interface OmniPayBridgeStub extends BaseContract {
     "nonpayable"
   >;
   getFunction(
+    nameOrSignature: "initiatedTransactions"
+  ): TypedContractMethod<
+    [arg0: BigNumberish],
+    [
+      [
+        bigint,
+        string,
+        string,
+        string,
+        bigint,
+        string,
+        string,
+        bigint,
+        bigint
+      ] & {
+        localTxId: bigint;
+        payer: string;
+        payee: string;
+        token: string;
+        amount: bigint;
+        chain: string;
+        paymentRef: string;
+        timestamp: bigint;
+        status: bigint;
+      }
+    ],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "isOperator"
+  ): TypedContractMethod<[operator: AddressLike], [boolean], "view">;
+  getFunction(
+    nameOrSignature: "markTransactionFailed"
+  ): TypedContractMethod<
+    [localTxId: BigNumberish, reason: string],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "nextTransactionId"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
     nameOrSignature: "owner"
   ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "removeOperator"
+  ): TypedContractMethod<[operator: AddressLike], [void], "nonpayable">;
   getFunction(
     nameOrSignature: "renounceOwnership"
   ): TypedContractMethod<[], [void], "nonpayable">;
@@ -307,11 +707,32 @@ export interface OmniPayBridgeStub extends BaseContract {
     CrossChainPaymentCompletedEvent.OutputObject
   >;
   getEvent(
+    key: "CrossChainPaymentFailed"
+  ): TypedContractEvent<
+    CrossChainPaymentFailedEvent.InputTuple,
+    CrossChainPaymentFailedEvent.OutputTuple,
+    CrossChainPaymentFailedEvent.OutputObject
+  >;
+  getEvent(
     key: "CrossChainPaymentInitiated"
   ): TypedContractEvent<
     CrossChainPaymentInitiatedEvent.InputTuple,
     CrossChainPaymentInitiatedEvent.OutputTuple,
     CrossChainPaymentInitiatedEvent.OutputObject
+  >;
+  getEvent(
+    key: "OperatorAdded"
+  ): TypedContractEvent<
+    OperatorAddedEvent.InputTuple,
+    OperatorAddedEvent.OutputTuple,
+    OperatorAddedEvent.OutputObject
+  >;
+  getEvent(
+    key: "OperatorRemoved"
+  ): TypedContractEvent<
+    OperatorRemovedEvent.InputTuple,
+    OperatorRemovedEvent.OutputTuple,
+    OperatorRemovedEvent.OutputObject
   >;
   getEvent(
     key: "OwnershipTransferred"
@@ -333,6 +754,17 @@ export interface OmniPayBridgeStub extends BaseContract {
       CrossChainPaymentCompletedEvent.OutputObject
     >;
 
+    "CrossChainPaymentFailed(uint256,address,address,string,string)": TypedContractEvent<
+      CrossChainPaymentFailedEvent.InputTuple,
+      CrossChainPaymentFailedEvent.OutputTuple,
+      CrossChainPaymentFailedEvent.OutputObject
+    >;
+    CrossChainPaymentFailed: TypedContractEvent<
+      CrossChainPaymentFailedEvent.InputTuple,
+      CrossChainPaymentFailedEvent.OutputTuple,
+      CrossChainPaymentFailedEvent.OutputObject
+    >;
+
     "CrossChainPaymentInitiated(uint256,address,address,address,uint256,string,string)": TypedContractEvent<
       CrossChainPaymentInitiatedEvent.InputTuple,
       CrossChainPaymentInitiatedEvent.OutputTuple,
@@ -342,6 +774,28 @@ export interface OmniPayBridgeStub extends BaseContract {
       CrossChainPaymentInitiatedEvent.InputTuple,
       CrossChainPaymentInitiatedEvent.OutputTuple,
       CrossChainPaymentInitiatedEvent.OutputObject
+    >;
+
+    "OperatorAdded(address)": TypedContractEvent<
+      OperatorAddedEvent.InputTuple,
+      OperatorAddedEvent.OutputTuple,
+      OperatorAddedEvent.OutputObject
+    >;
+    OperatorAdded: TypedContractEvent<
+      OperatorAddedEvent.InputTuple,
+      OperatorAddedEvent.OutputTuple,
+      OperatorAddedEvent.OutputObject
+    >;
+
+    "OperatorRemoved(address)": TypedContractEvent<
+      OperatorRemovedEvent.InputTuple,
+      OperatorRemovedEvent.OutputTuple,
+      OperatorRemovedEvent.OutputObject
+    >;
+    OperatorRemoved: TypedContractEvent<
+      OperatorRemovedEvent.InputTuple,
+      OperatorRemovedEvent.OutputTuple,
+      OperatorRemovedEvent.OutputObject
     >;
 
     "OwnershipTransferred(address,address)": TypedContractEvent<

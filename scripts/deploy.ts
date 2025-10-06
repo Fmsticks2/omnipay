@@ -1,4 +1,6 @@
 import { ethers } from "hardhat";
+import { writeFileSync } from "fs";
+import { join } from "path";
 
 async function main() {
   const [deployer] = await ethers.getSigners();
@@ -10,13 +12,13 @@ async function main() {
 
   // Deploy Notifier
   const Notifier = await ethers.getContractFactory("OmniPayNotifier");
-  const notifier = await Notifier.deploy(PUSH_COMM, PUSH_CHANNEL);
+  const notifier = await Notifier.deploy(deployer.address, PUSH_COMM, PUSH_CHANNEL);
   await notifier.waitForDeployment();
   console.log(`OmniPayNotifier: ${await notifier.getAddress()}`);
 
   // Deploy Core
   const Core = await ethers.getContractFactory("OmniPayCore");
-  const core = await Core.deploy(await notifier.getAddress());
+  const core = await Core.deploy(deployer.address, await notifier.getAddress());
   await core.waitForDeployment();
   console.log(`OmniPayCore: ${await core.getAddress()}`);
 
@@ -28,7 +30,7 @@ async function main() {
 
   // Deploy Settlement
   const Settlement = await ethers.getContractFactory("OmniPaySettlement");
-  const settlement = await Settlement.deploy(await notifier.getAddress());
+  const settlement = await Settlement.deploy(deployer.address, await notifier.getAddress());
   await settlement.waitForDeployment();
   console.log(`OmniPaySettlement: ${await settlement.getAddress()}`);
 
@@ -44,18 +46,32 @@ async function main() {
 
   // Deploy Bridge Stub (for testing/fallback)
   const BridgeStub = await ethers.getContractFactory("OmniPayBridgeStub");
-  const bridgeStub = await BridgeStub.deploy();
+  const bridgeStub = await BridgeStub.deploy(deployer.address);
   await bridgeStub.waitForDeployment();
   console.log(`OmniPayBridgeStub: ${await bridgeStub.getAddress()}`);
 
-  console.log("\n=== Deployment Summary ===");
-  console.log(`Network: ${(await deployer.provider!.getNetwork()).name}`);
-  console.log(`OmniPayNotifier: ${await notifier.getAddress()}`);
-  console.log(`OmniPayCore: ${await core.getAddress()}`);
-  console.log(`OmniPaySubscription: ${await subscription.getAddress()}`);
-  console.log(`OmniPaySettlement: ${await settlement.getAddress()}`);
-  console.log(`OmniPayBridge: ${await bridge.getAddress()}`);
-  console.log(`OmniPayBridgeStub: ${await bridgeStub.getAddress()}`);
+  // Create deployment info for frontend
+  const deploymentInfo = {
+    network: (await deployer.provider!.getNetwork()).name,
+    chainId: (await deployer.provider!.getNetwork()).chainId.toString(),
+    deployer: deployer.address,
+    contracts: {
+      OmniPayNotifier: await notifier.getAddress(),
+      OmniPayCore: await core.getAddress(),
+      OmniPaySubscription: await subscription.getAddress(),
+      OmniPaySettlement: await settlement.getAddress(),
+      OmniPayBridge: await bridge.getAddress(),
+      OmniPayBridgeStub: await bridgeStub.getAddress()
+    },
+    deployedAt: new Date().toISOString()
+  };
+
+  // Save deployment info to frontend
+  const frontendPath = join(__dirname, "../frontend/src/config/contracts.json");
+  writeFileSync(frontendPath, JSON.stringify(deploymentInfo, null, 2));
+  console.log(`\nDeployment info saved to: ${frontendPath}`);
+  console.log("\nDeployment Summary:");
+  console.log(JSON.stringify(deploymentInfo, null, 2));
 }
 
 main().catch((error) => {

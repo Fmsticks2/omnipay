@@ -1,7 +1,8 @@
 import { motion } from 'framer-motion';
 import { Link } from '@tanstack/react-router';
 import type { FunctionComponent } from '../../common/types';
-import Icon, { UI_ICONS } from './Icon';
+import Icon from './Icon';
+import { UI_ICONS } from './iconConstants';
 
 const Hero = (): FunctionComponent => {
   return (

@@ -1,19 +1,26 @@
-import { mainnet, polygon, optimism, arbitrum, base } from 'wagmi/chains';
-import { PUSH_CHAIN_CONFIG } from './contracts';
+import { mainnet, polygon, optimism, arbitrum, base, hardhat } from 'wagmi/chains';
+import { NETWORK_CONFIG } from './contracts';
 
-// Define the Push Chain as a custom chain
-export const pushChain = {
-  ...PUSH_CHAIN_CONFIG,
+// Define the local Hardhat network
+export const localHardhat = {
+  ...hardhat,
+  id: NETWORK_CONFIG.chainId,
+  name: 'Local Hardhat',
+  rpcUrls: {
+    default: {
+      http: ['http://127.0.0.1:8545'],
+    },
+  },
 } as const;
 
 // All supported chains for OmniPay
 export const supportedChains = [
+  localHardhat,
   mainnet,
   polygon,
   optimism,
   arbitrum,
   base,
-  pushChain,
 ] as const;
 
 // Chain metadata for UI display
@@ -48,11 +55,11 @@ export const chainMetadata = {
     color: '#0052FF',
     logo: '🔵',
   },
-  [pushChain.id]: {
-    name: 'Push Chain',
-    shortName: 'PC',
-    color: '#DD44C7',
-    logo: '🟣',
+  [localHardhat.id]: {
+    name: 'Local Hardhat',
+    shortName: 'LOCAL',
+    color: '#F7DF1E',
+    logo: '⚡',
   },
 } as const;
 

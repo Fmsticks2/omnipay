@@ -1,6 +1,6 @@
 import { useWriteContract, useReadContract, useWaitForTransactionReceipt } from 'wagmi';
 import { parseEther, formatEther } from 'viem';
-import { OMNIPAY_CONTRACTS, OMNIPAY_CORE_ABI, OMNIPAY_SUBSCRIPTION_ABI } from '../config/contracts';
+import { OMNIPAY_CONTRACTS, CONTRACT_ABIS } from '../config/contracts';
 
 // Hook for sending payments
 export const useSendPayment = () => {
@@ -18,7 +18,7 @@ export const useSendPayment = () => {
     try {
       await writeContract({
         address: OMNIPAY_CONTRACTS.CORE,
-        abi: OMNIPAY_CORE_ABI,
+        abi: CONTRACT_ABIS.CORE,
         functionName: 'sendPayment',
         args: [to, parseEther(amount), token, reference],
         value: parseEther(amount), // For native token payments
@@ -55,7 +55,7 @@ export const useCreateSubscription = () => {
     try {
       await writeContract({
         address: OMNIPAY_CONTRACTS.SUBSCRIPTION,
-        abi: OMNIPAY_SUBSCRIPTION_ABI,
+        abi: CONTRACT_ABIS.SUBSCRIPTION,
         functionName: 'createSubscription',
         args: [merchant, token, parseEther(amount), BigInt(interval)],
       });
@@ -79,7 +79,7 @@ export const useCreateSubscription = () => {
 export const usePaymentHistory = (userAddress?: `0x${string}`) => {
   const { data, isLoading, error } = useReadContract({
     address: OMNIPAY_CONTRACTS.CORE,
-    abi: OMNIPAY_CORE_ABI,
+    abi: CONTRACT_ABIS.CORE,
     functionName: 'getPaymentHistory',
     args: userAddress ? [userAddress] : undefined,
     query: {

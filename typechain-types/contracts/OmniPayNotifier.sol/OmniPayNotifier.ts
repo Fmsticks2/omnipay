@@ -26,7 +26,13 @@ import type {
 export interface OmniPayNotifierInterface extends Interface {
   getFunction(
     nameOrSignature:
+      | "DEFAULT_ADMIN_ROLE"
+      | "NOTIFIER_ROLE"
       | "channel"
+      | "getRoleAdmin"
+      | "grantNotifierRole"
+      | "grantRole"
+      | "hasRole"
       | "notifyBeforeRenewal"
       | "notifyPaymentFailure"
       | "notifyPaymentSuccess"
@@ -34,25 +40,61 @@ export interface OmniPayNotifierInterface extends Interface {
       | "notifySubscriptionExecuted"
       | "owner"
       | "pushComm"
+      | "pushEnabled"
       | "renounceOwnership"
+      | "renounceRole"
+      | "revokeNotifierRole"
+      | "revokeRole"
+      | "sendBulkNotification"
+      | "sendCustomNotification"
       | "setChannel"
       | "setPushComm"
+      | "setPushEnabled"
+      | "supportsInterface"
       | "transferOwnership"
   ): FunctionFragment;
 
   getEvent(
     nameOrSignatureOrTopic:
       | "BeforeRenewal"
+      | "CustomNotification"
       | "NotifierConfigured"
       | "OwnershipTransferred"
       | "PaymentFailure"
       | "PaymentSuccess"
       | "PushAttempt"
+      | "RoleAdminChanged"
+      | "RoleGranted"
+      | "RoleRevoked"
       | "SubscriptionCancelled"
       | "SubscriptionExecuted"
   ): EventFragment;
 
+  encodeFunctionData(
+    functionFragment: "DEFAULT_ADMIN_ROLE",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "NOTIFIER_ROLE",
+    values?: undefined
+  ): string;
   encodeFunctionData(functionFragment: "channel", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "getRoleAdmin",
+    values: [BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "grantNotifierRole",
+    values: [AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "grantRole",
+    values: [BytesLike, AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "hasRole",
+    values: [BytesLike, AddressLike]
+  ): string;
   encodeFunctionData(
     functionFragment: "notifyBeforeRenewal",
     values: [BigNumberish, AddressLike, AddressLike, BigNumberish, BigNumberish]
@@ -90,8 +132,32 @@ export interface OmniPayNotifierInterface extends Interface {
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(functionFragment: "pushComm", values?: undefined): string;
   encodeFunctionData(
+    functionFragment: "pushEnabled",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "renounceOwnership",
     values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "renounceRole",
+    values: [BytesLike, AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "revokeNotifierRole",
+    values: [AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "revokeRole",
+    values: [BytesLike, AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "sendBulkNotification",
+    values: [AddressLike[], string, string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "sendCustomNotification",
+    values: [AddressLike, string, string, BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "setChannel",
@@ -102,11 +168,37 @@ export interface OmniPayNotifierInterface extends Interface {
     values: [AddressLike]
   ): string;
   encodeFunctionData(
+    functionFragment: "setPushEnabled",
+    values: [boolean]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "supportsInterface",
+    values: [BytesLike]
+  ): string;
+  encodeFunctionData(
     functionFragment: "transferOwnership",
     values: [AddressLike]
   ): string;
 
+  decodeFunctionResult(
+    functionFragment: "DEFAULT_ADMIN_ROLE",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "NOTIFIER_ROLE",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "channel", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "getRoleAdmin",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "grantNotifierRole",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "grantRole", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "hasRole", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "notifyBeforeRenewal",
     data: BytesLike
@@ -130,12 +222,41 @@ export interface OmniPayNotifierInterface extends Interface {
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "pushComm", data: BytesLike): Result;
   decodeFunctionResult(
+    functionFragment: "pushEnabled",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "renounceOwnership",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "renounceRole",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "revokeNotifierRole",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "revokeRole", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "sendBulkNotification",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "sendCustomNotification",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "setChannel", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "setPushComm",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "setPushEnabled",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "supportsInterface",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -172,12 +293,46 @@ export namespace BeforeRenewalEvent {
   export type LogDescription = TypedLogDescription<Event>;
 }
 
+export namespace CustomNotificationEvent {
+  export type InputTuple = [
+    recipient: AddressLike,
+    title: string,
+    body: string,
+    metadata: BytesLike
+  ];
+  export type OutputTuple = [
+    recipient: string,
+    title: string,
+    body: string,
+    metadata: string
+  ];
+  export interface OutputObject {
+    recipient: string;
+    title: string;
+    body: string;
+    metadata: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
 export namespace NotifierConfiguredEvent {
-  export type InputTuple = [pushComm: AddressLike, channel: AddressLike];
-  export type OutputTuple = [pushComm: string, channel: string];
+  export type InputTuple = [
+    pushComm: AddressLike,
+    channel: AddressLike,
+    pushEnabled: boolean
+  ];
+  export type OutputTuple = [
+    pushComm: string,
+    channel: string,
+    pushEnabled: boolean
+  ];
   export interface OutputObject {
     pushComm: string;
     channel: string;
+    pushEnabled: boolean;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -260,18 +415,79 @@ export namespace PaymentSuccessEvent {
 export namespace PushAttemptEvent {
   export type InputTuple = [
     recipient: AddressLike,
+    notificationType: BigNumberish,
     success: boolean,
     identity: BytesLike
   ];
   export type OutputTuple = [
     recipient: string,
+    notificationType: bigint,
     success: boolean,
     identity: string
   ];
   export interface OutputObject {
     recipient: string;
+    notificationType: bigint;
     success: boolean;
     identity: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace RoleAdminChangedEvent {
+  export type InputTuple = [
+    role: BytesLike,
+    previousAdminRole: BytesLike,
+    newAdminRole: BytesLike
+  ];
+  export type OutputTuple = [
+    role: string,
+    previousAdminRole: string,
+    newAdminRole: string
+  ];
+  export interface OutputObject {
+    role: string;
+    previousAdminRole: string;
+    newAdminRole: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace RoleGrantedEvent {
+  export type InputTuple = [
+    role: BytesLike,
+    account: AddressLike,
+    sender: AddressLike
+  ];
+  export type OutputTuple = [role: string, account: string, sender: string];
+  export interface OutputObject {
+    role: string;
+    account: string;
+    sender: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace RoleRevokedEvent {
+  export type InputTuple = [
+    role: BytesLike,
+    account: AddressLike,
+    sender: AddressLike
+  ];
+  export type OutputTuple = [role: string, account: string, sender: string];
+  export interface OutputObject {
+    role: string;
+    account: string;
+    sender: string;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -375,7 +591,31 @@ export interface OmniPayNotifier extends BaseContract {
     event?: TCEvent
   ): Promise<this>;
 
+  DEFAULT_ADMIN_ROLE: TypedContractMethod<[], [string], "view">;
+
+  NOTIFIER_ROLE: TypedContractMethod<[], [string], "view">;
+
   channel: TypedContractMethod<[], [string], "view">;
+
+  getRoleAdmin: TypedContractMethod<[role: BytesLike], [string], "view">;
+
+  grantNotifierRole: TypedContractMethod<
+    [notifier: AddressLike],
+    [void],
+    "nonpayable"
+  >;
+
+  grantRole: TypedContractMethod<
+    [role: BytesLike, account: AddressLike],
+    [void],
+    "nonpayable"
+  >;
+
+  hasRole: TypedContractMethod<
+    [role: BytesLike, account: AddressLike],
+    [boolean],
+    "view"
+  >;
 
   notifyBeforeRenewal: TypedContractMethod<
     [
@@ -437,7 +677,39 @@ export interface OmniPayNotifier extends BaseContract {
 
   pushComm: TypedContractMethod<[], [string], "view">;
 
+  pushEnabled: TypedContractMethod<[], [boolean], "view">;
+
   renounceOwnership: TypedContractMethod<[], [void], "nonpayable">;
+
+  renounceRole: TypedContractMethod<
+    [role: BytesLike, callerConfirmation: AddressLike],
+    [void],
+    "nonpayable"
+  >;
+
+  revokeNotifierRole: TypedContractMethod<
+    [notifier: AddressLike],
+    [void],
+    "nonpayable"
+  >;
+
+  revokeRole: TypedContractMethod<
+    [role: BytesLike, account: AddressLike],
+    [void],
+    "nonpayable"
+  >;
+
+  sendBulkNotification: TypedContractMethod<
+    [recipients: AddressLike[], title: string, body: string],
+    [void],
+    "nonpayable"
+  >;
+
+  sendCustomNotification: TypedContractMethod<
+    [recipient: AddressLike, title: string, body: string, metadata: BytesLike],
+    [void],
+    "nonpayable"
+  >;
 
   setChannel: TypedContractMethod<
     [_channel: AddressLike],
@@ -451,6 +723,14 @@ export interface OmniPayNotifier extends BaseContract {
     "nonpayable"
   >;
 
+  setPushEnabled: TypedContractMethod<[enabled: boolean], [void], "nonpayable">;
+
+  supportsInterface: TypedContractMethod<
+    [interfaceId: BytesLike],
+    [boolean],
+    "view"
+  >;
+
   transferOwnership: TypedContractMethod<
     [newOwner: AddressLike],
     [void],
@@ -462,8 +742,34 @@ export interface OmniPayNotifier extends BaseContract {
   ): T;
 
   getFunction(
+    nameOrSignature: "DEFAULT_ADMIN_ROLE"
+  ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "NOTIFIER_ROLE"
+  ): TypedContractMethod<[], [string], "view">;
+  getFunction(
     nameOrSignature: "channel"
   ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "getRoleAdmin"
+  ): TypedContractMethod<[role: BytesLike], [string], "view">;
+  getFunction(
+    nameOrSignature: "grantNotifierRole"
+  ): TypedContractMethod<[notifier: AddressLike], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "grantRole"
+  ): TypedContractMethod<
+    [role: BytesLike, account: AddressLike],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "hasRole"
+  ): TypedContractMethod<
+    [role: BytesLike, account: AddressLike],
+    [boolean],
+    "view"
+  >;
   getFunction(
     nameOrSignature: "notifyBeforeRenewal"
   ): TypedContractMethod<
@@ -532,14 +838,54 @@ export interface OmniPayNotifier extends BaseContract {
     nameOrSignature: "pushComm"
   ): TypedContractMethod<[], [string], "view">;
   getFunction(
+    nameOrSignature: "pushEnabled"
+  ): TypedContractMethod<[], [boolean], "view">;
+  getFunction(
     nameOrSignature: "renounceOwnership"
   ): TypedContractMethod<[], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "renounceRole"
+  ): TypedContractMethod<
+    [role: BytesLike, callerConfirmation: AddressLike],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "revokeNotifierRole"
+  ): TypedContractMethod<[notifier: AddressLike], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "revokeRole"
+  ): TypedContractMethod<
+    [role: BytesLike, account: AddressLike],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "sendBulkNotification"
+  ): TypedContractMethod<
+    [recipients: AddressLike[], title: string, body: string],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "sendCustomNotification"
+  ): TypedContractMethod<
+    [recipient: AddressLike, title: string, body: string, metadata: BytesLike],
+    [void],
+    "nonpayable"
+  >;
   getFunction(
     nameOrSignature: "setChannel"
   ): TypedContractMethod<[_channel: AddressLike], [void], "nonpayable">;
   getFunction(
     nameOrSignature: "setPushComm"
   ): TypedContractMethod<[_pushComm: AddressLike], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "setPushEnabled"
+  ): TypedContractMethod<[enabled: boolean], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "supportsInterface"
+  ): TypedContractMethod<[interfaceId: BytesLike], [boolean], "view">;
   getFunction(
     nameOrSignature: "transferOwnership"
   ): TypedContractMethod<[newOwner: AddressLike], [void], "nonpayable">;
@@ -550,6 +896,13 @@ export interface OmniPayNotifier extends BaseContract {
     BeforeRenewalEvent.InputTuple,
     BeforeRenewalEvent.OutputTuple,
     BeforeRenewalEvent.OutputObject
+  >;
+  getEvent(
+    key: "CustomNotification"
+  ): TypedContractEvent<
+    CustomNotificationEvent.InputTuple,
+    CustomNotificationEvent.OutputTuple,
+    CustomNotificationEvent.OutputObject
   >;
   getEvent(
     key: "NotifierConfigured"
@@ -587,6 +940,27 @@ export interface OmniPayNotifier extends BaseContract {
     PushAttemptEvent.OutputObject
   >;
   getEvent(
+    key: "RoleAdminChanged"
+  ): TypedContractEvent<
+    RoleAdminChangedEvent.InputTuple,
+    RoleAdminChangedEvent.OutputTuple,
+    RoleAdminChangedEvent.OutputObject
+  >;
+  getEvent(
+    key: "RoleGranted"
+  ): TypedContractEvent<
+    RoleGrantedEvent.InputTuple,
+    RoleGrantedEvent.OutputTuple,
+    RoleGrantedEvent.OutputObject
+  >;
+  getEvent(
+    key: "RoleRevoked"
+  ): TypedContractEvent<
+    RoleRevokedEvent.InputTuple,
+    RoleRevokedEvent.OutputTuple,
+    RoleRevokedEvent.OutputObject
+  >;
+  getEvent(
     key: "SubscriptionCancelled"
   ): TypedContractEvent<
     SubscriptionCancelledEvent.InputTuple,
@@ -613,7 +987,18 @@ export interface OmniPayNotifier extends BaseContract {
       BeforeRenewalEvent.OutputObject
     >;
 
-    "NotifierConfigured(address,address)": TypedContractEvent<
+    "CustomNotification(address,string,string,bytes)": TypedContractEvent<
+      CustomNotificationEvent.InputTuple,
+      CustomNotificationEvent.OutputTuple,
+      CustomNotificationEvent.OutputObject
+    >;
+    CustomNotification: TypedContractEvent<
+      CustomNotificationEvent.InputTuple,
+      CustomNotificationEvent.OutputTuple,
+      CustomNotificationEvent.OutputObject
+    >;
+
+    "NotifierConfigured(address,address,bool)": TypedContractEvent<
       NotifierConfiguredEvent.InputTuple,
       NotifierConfiguredEvent.OutputTuple,
       NotifierConfiguredEvent.OutputObject
@@ -657,7 +1042,7 @@ export interface OmniPayNotifier extends BaseContract {
       PaymentSuccessEvent.OutputObject
     >;
 
-    "PushAttempt(address,bool,bytes)": TypedContractEvent<
+    "PushAttempt(address,uint8,bool,bytes)": TypedContractEvent<
       PushAttemptEvent.InputTuple,
       PushAttemptEvent.OutputTuple,
       PushAttemptEvent.OutputObject
@@ -666,6 +1051,39 @@ export interface OmniPayNotifier extends BaseContract {
       PushAttemptEvent.InputTuple,
       PushAttemptEvent.OutputTuple,
       PushAttemptEvent.OutputObject
+    >;
+
+    "RoleAdminChanged(bytes32,bytes32,bytes32)": TypedContractEvent<
+      RoleAdminChangedEvent.InputTuple,
+      RoleAdminChangedEvent.OutputTuple,
+      RoleAdminChangedEvent.OutputObject
+    >;
+    RoleAdminChanged: TypedContractEvent<
+      RoleAdminChangedEvent.InputTuple,
+      RoleAdminChangedEvent.OutputTuple,
+      RoleAdminChangedEvent.OutputObject
+    >;
+
+    "RoleGranted(bytes32,address,address)": TypedContractEvent<
+      RoleGrantedEvent.InputTuple,
+      RoleGrantedEvent.OutputTuple,
+      RoleGrantedEvent.OutputObject
+    >;
+    RoleGranted: TypedContractEvent<
+      RoleGrantedEvent.InputTuple,
+      RoleGrantedEvent.OutputTuple,
+      RoleGrantedEvent.OutputObject
+    >;
+
+    "RoleRevoked(bytes32,address,address)": TypedContractEvent<
+      RoleRevokedEvent.InputTuple,
+      RoleRevokedEvent.OutputTuple,
+      RoleRevokedEvent.OutputObject
+    >;
+    RoleRevoked: TypedContractEvent<
+      RoleRevokedEvent.InputTuple,
+      RoleRevokedEvent.OutputTuple,
+      RoleRevokedEvent.OutputObject
     >;
 
     "SubscriptionCancelled(uint256,address,address)": TypedContractEvent<

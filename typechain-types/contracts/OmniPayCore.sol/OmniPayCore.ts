@@ -23,11 +23,42 @@ import type {
   TypedContractMethod,
 } from "../../common";
 
+export declare namespace OmniPayCore {
+  export type TransactionStruct = {
+    payer: AddressLike;
+    payee: AddressLike;
+    token: AddressLike;
+    amount: BigNumberish;
+    timestamp: BigNumberish;
+    paymentRef: string;
+  };
+
+  export type TransactionStructOutput = [
+    payer: string,
+    payee: string,
+    token: string,
+    amount: bigint,
+    timestamp: bigint,
+    paymentRef: string
+  ] & {
+    payer: string;
+    payee: string;
+    token: string;
+    amount: bigint;
+    timestamp: bigint;
+    paymentRef: string;
+  };
+}
+
 export interface OmniPayCoreInterface extends Interface {
   getFunction(
     nameOrSignature:
+      | "MAX_PAYMENT_REF_LENGTH"
+      | "getTransactions"
       | "notifier"
       | "owner"
+      | "pause"
+      | "paused"
       | "payERC20"
       | "payETH"
       | "renounceOwnership"
@@ -35,17 +66,32 @@ export interface OmniPayCoreInterface extends Interface {
       | "transactionCount"
       | "transactions"
       | "transferOwnership"
+      | "unpause"
   ): FunctionFragment;
 
   getEvent(
     nameOrSignatureOrTopic:
+      | "NotifierUpdated"
       | "OwnershipTransferred"
+      | "Paused"
       | "PaymentCompleted"
+      | "PaymentFailed"
       | "PaymentInitiated"
+      | "Unpaused"
   ): EventFragment;
 
+  encodeFunctionData(
+    functionFragment: "MAX_PAYMENT_REF_LENGTH",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getTransactions",
+    values: [BigNumberish, BigNumberish]
+  ): string;
   encodeFunctionData(functionFragment: "notifier", values?: undefined): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
+  encodeFunctionData(functionFragment: "pause", values?: undefined): string;
+  encodeFunctionData(functionFragment: "paused", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "payERC20",
     values: [AddressLike, AddressLike, BigNumberish, string]
@@ -74,9 +120,20 @@ export interface OmniPayCoreInterface extends Interface {
     functionFragment: "transferOwnership",
     values: [AddressLike]
   ): string;
+  encodeFunctionData(functionFragment: "unpause", values?: undefined): string;
 
+  decodeFunctionResult(
+    functionFragment: "MAX_PAYMENT_REF_LENGTH",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getTransactions",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "notifier", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "pause", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "paused", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "payERC20", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "payETH", data: BytesLike): Result;
   decodeFunctionResult(
@@ -99,6 +156,20 @@ export interface OmniPayCoreInterface extends Interface {
     functionFragment: "transferOwnership",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "unpause", data: BytesLike): Result;
+}
+
+export namespace NotifierUpdatedEvent {
+  export type InputTuple = [oldNotifier: AddressLike, newNotifier: AddressLike];
+  export type OutputTuple = [oldNotifier: string, newNotifier: string];
+  export interface OutputObject {
+    oldNotifier: string;
+    newNotifier: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
 
 export namespace OwnershipTransferredEvent {
@@ -107,6 +178,18 @@ export namespace OwnershipTransferredEvent {
   export interface OutputObject {
     previousOwner: string;
     newOwner: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace PausedEvent {
+  export type InputTuple = [account: AddressLike];
+  export type OutputTuple = [account: string];
+  export interface OutputObject {
+    account: string;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -145,6 +228,37 @@ export namespace PaymentCompletedEvent {
   export type LogDescription = TypedLogDescription<Event>;
 }
 
+export namespace PaymentFailedEvent {
+  export type InputTuple = [
+    payer: AddressLike,
+    payee: AddressLike,
+    token: AddressLike,
+    amount: BigNumberish,
+    paymentRef: string,
+    reason: string
+  ];
+  export type OutputTuple = [
+    payer: string,
+    payee: string,
+    token: string,
+    amount: bigint,
+    paymentRef: string,
+    reason: string
+  ];
+  export interface OutputObject {
+    payer: string;
+    payee: string;
+    token: string;
+    amount: bigint;
+    paymentRef: string;
+    reason: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
 export namespace PaymentInitiatedEvent {
   export type InputTuple = [
     payer: AddressLike,
@@ -166,6 +280,18 @@ export namespace PaymentInitiatedEvent {
     token: string;
     amount: bigint;
     paymentRef: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace UnpausedEvent {
+  export type InputTuple = [account: AddressLike];
+  export type OutputTuple = [account: string];
+  export interface OutputObject {
+    account: string;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -216,9 +342,21 @@ export interface OmniPayCore extends BaseContract {
     event?: TCEvent
   ): Promise<this>;
 
+  MAX_PAYMENT_REF_LENGTH: TypedContractMethod<[], [bigint], "view">;
+
+  getTransactions: TypedContractMethod<
+    [startIndex: BigNumberish, count: BigNumberish],
+    [OmniPayCore.TransactionStructOutput[]],
+    "view"
+  >;
+
   notifier: TypedContractMethod<[], [string], "view">;
 
   owner: TypedContractMethod<[], [string], "view">;
+
+  pause: TypedContractMethod<[], [void], "nonpayable">;
+
+  paused: TypedContractMethod<[], [boolean], "view">;
 
   payERC20: TypedContractMethod<
     [
@@ -268,16 +406,34 @@ export interface OmniPayCore extends BaseContract {
     "nonpayable"
   >;
 
+  unpause: TypedContractMethod<[], [void], "nonpayable">;
+
   getFunction<T extends ContractMethod = ContractMethod>(
     key: string | FunctionFragment
   ): T;
 
+  getFunction(
+    nameOrSignature: "MAX_PAYMENT_REF_LENGTH"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "getTransactions"
+  ): TypedContractMethod<
+    [startIndex: BigNumberish, count: BigNumberish],
+    [OmniPayCore.TransactionStructOutput[]],
+    "view"
+  >;
   getFunction(
     nameOrSignature: "notifier"
   ): TypedContractMethod<[], [string], "view">;
   getFunction(
     nameOrSignature: "owner"
   ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "pause"
+  ): TypedContractMethod<[], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "paused"
+  ): TypedContractMethod<[], [boolean], "view">;
   getFunction(
     nameOrSignature: "payERC20"
   ): TypedContractMethod<
@@ -325,13 +481,30 @@ export interface OmniPayCore extends BaseContract {
   getFunction(
     nameOrSignature: "transferOwnership"
   ): TypedContractMethod<[newOwner: AddressLike], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "unpause"
+  ): TypedContractMethod<[], [void], "nonpayable">;
 
+  getEvent(
+    key: "NotifierUpdated"
+  ): TypedContractEvent<
+    NotifierUpdatedEvent.InputTuple,
+    NotifierUpdatedEvent.OutputTuple,
+    NotifierUpdatedEvent.OutputObject
+  >;
   getEvent(
     key: "OwnershipTransferred"
   ): TypedContractEvent<
     OwnershipTransferredEvent.InputTuple,
     OwnershipTransferredEvent.OutputTuple,
     OwnershipTransferredEvent.OutputObject
+  >;
+  getEvent(
+    key: "Paused"
+  ): TypedContractEvent<
+    PausedEvent.InputTuple,
+    PausedEvent.OutputTuple,
+    PausedEvent.OutputObject
   >;
   getEvent(
     key: "PaymentCompleted"
@@ -341,14 +514,39 @@ export interface OmniPayCore extends BaseContract {
     PaymentCompletedEvent.OutputObject
   >;
   getEvent(
+    key: "PaymentFailed"
+  ): TypedContractEvent<
+    PaymentFailedEvent.InputTuple,
+    PaymentFailedEvent.OutputTuple,
+    PaymentFailedEvent.OutputObject
+  >;
+  getEvent(
     key: "PaymentInitiated"
   ): TypedContractEvent<
     PaymentInitiatedEvent.InputTuple,
     PaymentInitiatedEvent.OutputTuple,
     PaymentInitiatedEvent.OutputObject
   >;
+  getEvent(
+    key: "Unpaused"
+  ): TypedContractEvent<
+    UnpausedEvent.InputTuple,
+    UnpausedEvent.OutputTuple,
+    UnpausedEvent.OutputObject
+  >;
 
   filters: {
+    "NotifierUpdated(address,address)": TypedContractEvent<
+      NotifierUpdatedEvent.InputTuple,
+      NotifierUpdatedEvent.OutputTuple,
+      NotifierUpdatedEvent.OutputObject
+    >;
+    NotifierUpdated: TypedContractEvent<
+      NotifierUpdatedEvent.InputTuple,
+      NotifierUpdatedEvent.OutputTuple,
+      NotifierUpdatedEvent.OutputObject
+    >;
+
     "OwnershipTransferred(address,address)": TypedContractEvent<
       OwnershipTransferredEvent.InputTuple,
       OwnershipTransferredEvent.OutputTuple,
@@ -358,6 +556,17 @@ export interface OmniPayCore extends BaseContract {
       OwnershipTransferredEvent.InputTuple,
       OwnershipTransferredEvent.OutputTuple,
       OwnershipTransferredEvent.OutputObject
+    >;
+
+    "Paused(address)": TypedContractEvent<
+      PausedEvent.InputTuple,
+      PausedEvent.OutputTuple,
+      PausedEvent.OutputObject
+    >;
+    Paused: TypedContractEvent<
+      PausedEvent.InputTuple,
+      PausedEvent.OutputTuple,
+      PausedEvent.OutputObject
     >;
 
     "PaymentCompleted(uint256,address,address,address,uint256,string)": TypedContractEvent<
@@ -371,6 +580,17 @@ export interface OmniPayCore extends BaseContract {
       PaymentCompletedEvent.OutputObject
     >;
 
+    "PaymentFailed(address,address,address,uint256,string,string)": TypedContractEvent<
+      PaymentFailedEvent.InputTuple,
+      PaymentFailedEvent.OutputTuple,
+      PaymentFailedEvent.OutputObject
+    >;
+    PaymentFailed: TypedContractEvent<
+      PaymentFailedEvent.InputTuple,
+      PaymentFailedEvent.OutputTuple,
+      PaymentFailedEvent.OutputObject
+    >;
+
     "PaymentInitiated(address,address,address,uint256,string)": TypedContractEvent<
       PaymentInitiatedEvent.InputTuple,
       PaymentInitiatedEvent.OutputTuple,
@@ -380,6 +600,17 @@ export interface OmniPayCore extends BaseContract {
       PaymentInitiatedEvent.InputTuple,
       PaymentInitiatedEvent.OutputTuple,
       PaymentInitiatedEvent.OutputObject
+    >;
+
+    "Unpaused(address)": TypedContractEvent<
+      UnpausedEvent.InputTuple,
+      UnpausedEvent.OutputTuple,
+      UnpausedEvent.OutputObject
+    >;
+    Unpaused: TypedContractEvent<
+      UnpausedEvent.InputTuple,
+      UnpausedEvent.OutputTuple,
+      UnpausedEvent.OutputObject
     >;
   };
 }
