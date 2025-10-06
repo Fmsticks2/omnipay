@@ -17,6 +17,25 @@ export default function Icon({
   color, 
   onClick 
 }: IconProps) {
+  // Check if it's an SVG path (starts with /)
+  if (icon.startsWith('/')) {
+    return (
+      <img
+        src={icon}
+        alt="icon"
+        className={cn(
+          'inline-block',
+          onClick && 'cursor-pointer hover:opacity-80 transition-opacity',
+          className
+        )}
+        width={size}
+        height={size}
+        style={{ color }}
+        onClick={onClick}
+      />
+    );
+  }
+
   return (
     <IconifyIcon
       icon={icon}

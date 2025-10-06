@@ -22,10 +22,10 @@ const HomePage = (): FunctionComponent => {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-white">
+            <h2 className="text-3xl md:text-4xl font-bold mb-6 text-white">
               Why Choose OmniPay?
             </h2>
-            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+            <p className="text-lg text-gray-400 max-w-2xl mx-auto">
               Built for the future of decentralized finance with cutting-edge technology and user-centric design.
             </p>
           </motion.div>
@@ -42,8 +42,8 @@ const HomePage = (): FunctionComponent => {
                   <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mb-6 mx-auto">
                     <Icon icon={UI_ICONS.security} size={32} className="text-white" />
                   </div>
-                  <h3 className="text-2xl font-bold text-white mb-4">Secure & Trustless</h3>
-                  <p className="text-gray-300">
+                  <h3 className="text-xl font-bold text-white mb-4">Secure & Trustless</h3>
+                  <p className="text-gray-400 text-sm leading-relaxed">
                     Built on battle-tested smart contracts with multi-layer security protocols and decentralized architecture.
                   </p>
                 </div>
@@ -61,8 +61,8 @@ const HomePage = (): FunctionComponent => {
                   <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mb-6 mx-auto">
                     <Icon icon={UI_ICONS.speed} size={32} className="text-white" />
                   </div>
-                  <h3 className="text-2xl font-bold text-white mb-4">Lightning Fast</h3>
-                  <p className="text-gray-300">
+                  <h3 className="text-xl font-bold text-white mb-4">Lightning Fast</h3>
+                  <p className="text-gray-400 text-sm leading-relaxed">
                     Experience near-instant transactions with optimized gas usage and advanced layer-2 integration.
                   </p>
                 </div>
@@ -80,8 +80,8 @@ const HomePage = (): FunctionComponent => {
                   <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mb-6 mx-auto">
                     <Icon icon={UI_ICONS.network} size={32} className="text-white" />
                   </div>
-                  <h3 className="text-2xl font-bold text-white mb-4">Multi-Chain</h3>
-                  <p className="text-gray-300">
+                  <h3 className="text-xl font-bold text-white mb-4">Multi-Chain</h3>
+                  <p className="text-gray-400 text-sm leading-relaxed">
                     Seamlessly operate across Ethereum, Polygon, BSC, and other major blockchain networks.
                   </p>
                 </div>
@@ -92,7 +92,7 @@ const HomePage = (): FunctionComponent => {
       </section>
 
       {/* Stats Section */}
-      <section className="py-20 px-6 bg-blue-900/20">
+      <section className="py-20 px-6" style={{ backgroundColor: 'rgba(6, 0, 17, 0.2)' }}>
         <div className="container mx-auto">
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
@@ -105,25 +105,25 @@ const HomePage = (): FunctionComponent => {
               <h3 className="text-4xl md:text-5xl font-bold text-blue-400 mb-2">
                 $50M+
               </h3>
-              <p className="text-gray-300 text-lg">Total Volume Processed</p>
+              <p className="text-gray-400 text-base">Total Volume Processed</p>
             </div>
             <div>
               <h3 className="text-4xl md:text-5xl font-bold text-blue-400 mb-2">
                 100K+
               </h3>
-              <p className="text-gray-300 text-lg">Active Users</p>
+              <p className="text-gray-400 text-base">Active Users</p>
             </div>
             <div>
               <h3 className="text-4xl md:text-5xl font-bold text-blue-400 mb-2">
                 15+
               </h3>
-              <p className="text-gray-300 text-lg">Supported Networks</p>
+              <p className="text-gray-400 text-base">Supported Networks</p>
             </div>
             <div>
               <h3 className="text-4xl md:text-5xl font-bold text-blue-400 mb-2">
                 99.9%
               </h3>
-              <p className="text-gray-300 text-lg">Uptime</p>
+              <p className="text-gray-400 text-base">Uptime</p>
             </div>
           </motion.div>
         </div>
