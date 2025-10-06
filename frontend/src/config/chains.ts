@@ -1,4 +1,4 @@
-import { mainnet, polygon, optimism, arbitrum, base, hardhat } from 'wagmi/chains';
+import { mainnet, polygon, optimism, arbitrum, base } from 'wagmi/chains';
 import { NETWORK_CONFIG } from './contracts';
 
 // Define the Push testnet network

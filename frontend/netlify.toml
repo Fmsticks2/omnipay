@@ -5,15 +5,18 @@
   # Directory that contains the deploy-ready HTML files and assets
   publish = "dist/"
   
-  # Default build command
-  command = "npm run build:production"
+  # Default build command - use pnpm with no-frozen-lockfile to handle lockfile issues
+  command = "pnpm install --no-frozen-lockfile && pnpm run build:production"
 
 [build.environment]
   # Node.js version
   NODE_VERSION = "18"
   
-  # NPM version
-  NPM_VERSION = "9"
+  # Enable pnpm
+  PNPM_VERSION = "10.17.1"
+  
+  # Disable frozen lockfile for CI
+  PNPM_FLAGS = "--no-frozen-lockfile"
 
 # Redirect rules for SPA routing
 [[redirects]]
@@ -53,13 +56,13 @@
 
 # Environment-specific settings
 [context.production]
-  command = "npm run build:production"
+  command = "pnpm install --no-frozen-lockfile && pnpm run build:production"
 
 [context.deploy-preview]
-  command = "npm run build"
+  command = "pnpm install --no-frozen-lockfile && pnpm run build"
 
 [context.branch-deploy]
-  command = "npm run build"
+  command = "pnpm install --no-frozen-lockfile && pnpm run build"
 
 # Functions configuration (if needed for serverless functions)
 [functions]

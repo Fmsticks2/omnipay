@@ -10,9 +10,9 @@ import Button from '../components/ui/Button';
 import { OMNIPAY_CONTRACTS, CONTRACT_ABIS } from '../config/contracts';
 
 const BridgePage = (): FunctionComponent => {
-  const { address, isConnected, chain } = useAccount();
-  const { writeContract, data: hash, isPending, error } = useWriteContract();
-  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
+  const { address, isConnected } = useAccount();
+  const { writeContract, data: hash } = useWriteContract();
+  const { isSuccess } = useWaitForTransactionReceipt({
     hash,
   });
 
