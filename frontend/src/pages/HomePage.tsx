@@ -1,0 +1,163 @@
+import { motion } from 'framer-motion';
+import type { FunctionComponent } from '../common/types';
+import Layout from '../components/layout/Layout';
+import Hero from '../components/ui/Hero';
+import Card from '../components/ui/Card';
+import Button from '../components/ui/Button';
+import Icon, { UI_ICONS } from '../components/ui/Icon';
+
+const HomePage = (): FunctionComponent => {
+  return (
+    <Layout>
+      <Hero />
+      
+      {/* Features Section */}
+      <section className="py-20 px-6">
+        <div className="container mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-white">
+              Why Choose OmniPay?
+            </h2>
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+              Built for the future of decentralized finance with cutting-edge technology and user-centric design.
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <motion.div
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              viewport={{ once: true }}
+            >
+              <Card gradient>
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mb-6 mx-auto">
+                    <Icon icon={UI_ICONS.security} size={32} className="text-white" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-white mb-4">Secure & Trustless</h3>
+                  <p className="text-gray-300">
+                    Built on battle-tested smart contracts with multi-layer security protocols and decentralized architecture.
+                  </p>
+                </div>
+              </Card>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              viewport={{ once: true }}
+            >
+              <Card gradient>
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mb-6 mx-auto">
+                    <Icon icon={UI_ICONS.speed} size={32} className="text-white" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-white mb-4">Lightning Fast</h3>
+                  <p className="text-gray-300">
+                    Experience near-instant transactions with optimized gas usage and advanced layer-2 integration.
+                  </p>
+                </div>
+              </Card>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              viewport={{ once: true }}
+            >
+              <Card gradient>
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mb-6 mx-auto">
+                    <Icon icon={UI_ICONS.network} size={32} className="text-white" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-white mb-4">Multi-Chain</h3>
+                  <p className="text-gray-300">
+                    Seamlessly operate across Ethereum, Polygon, BSC, and other major blockchain networks.
+                  </p>
+                </div>
+              </Card>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Stats Section */}
+      <section className="py-20 px-6 bg-blue-900/20">
+        <div className="container mx-auto">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="grid grid-cols-1 md:grid-cols-4 gap-8 text-center"
+          >
+            <div>
+              <h3 className="text-4xl md:text-5xl font-bold text-blue-400 mb-2">
+                $50M+
+              </h3>
+              <p className="text-gray-300 text-lg">Total Volume Processed</p>
+            </div>
+            <div>
+              <h3 className="text-4xl md:text-5xl font-bold text-blue-400 mb-2">
+                100K+
+              </h3>
+              <p className="text-gray-300 text-lg">Active Users</p>
+            </div>
+            <div>
+              <h3 className="text-4xl md:text-5xl font-bold text-blue-400 mb-2">
+                15+
+              </h3>
+              <p className="text-gray-300 text-lg">Supported Networks</p>
+            </div>
+            <div>
+              <h3 className="text-4xl md:text-5xl font-bold text-blue-400 mb-2">
+                99.9%
+              </h3>
+              <p className="text-gray-300 text-lg">Uptime</p>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-20 px-6">
+        <div className="container mx-auto text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-white">
+              Ready to Get Started?
+            </h2>
+            <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
+              Join thousands of users who trust OmniPay for their cross-chain payment needs.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button size="lg" variant="primary">
+                <Icon icon={UI_ICONS.wallet} size={20} className="mr-2" />
+                Connect Wallet
+              </Button>
+              <Button size="lg" variant="outline">
+                <Icon icon={UI_ICONS.document} size={20} className="mr-2" />
+                View Documentation
+              </Button>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+    </Layout>
+  );
+};
+
+export default HomePage;
