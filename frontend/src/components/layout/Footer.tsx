@@ -111,9 +111,9 @@ const Footer = (): FunctionComponent => {
 
         <div className="border-t border-white/10 mt-8 pt-8 text-center">
           <p className="text-gray-400 flex items-center justify-center space-x-2">
-            <span>© 2024 OmniPay. All rights reserved. Built with</span>
+            <span>© 2025 OmniPay. All rights reserved. Built with</span>
             <Icon icon="mdi:heart" size={16} color="#ef4444" />
-            <span>for the decentralized future.</span>
+            <span>for Push Protocol</span>
           </p>
         </div>
       </div>
