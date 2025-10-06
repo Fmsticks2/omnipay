@@ -7,13 +7,15 @@ import { UI_ICONS } from '../ui/iconConstants';
 
 const Header = (): FunctionComponent => {
   return (
-    <motion.header
-      initial={{ y: -100, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.6, ease: "easeOut" }}
-      className="bg-blue-900 backdrop-blur-md border-b border-white/10 sticky top-0 z-50"
-    >
-      <div className="container mx-auto px-6 py-4">
+    <div className="sticky top-0 z-50 flex justify-center px-6 py-4">
+      <motion.header
+        initial={{ y: -100, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+        className="backdrop-blur-md border border-white/10 rounded-2xl max-w-6xl w-full"
+        style={{ backgroundColor: '#060011' }}
+      >
+        <div className="px-6 py-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
           <motion.div
@@ -21,7 +23,7 @@ const Header = (): FunctionComponent => {
             className="flex items-center space-x-3"
           >
             <Link to="/" className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: '#060011', border: '1px solid rgba(255,255,255,0.2)' }}>
                 <Icon icon="mdi:wallet" size={24} color="white" />
               </div>
               <span className="text-2xl font-bold text-white">
@@ -74,8 +76,9 @@ const Header = (): FunctionComponent => {
             <ConnectButton />
           </div>
         </div>
-      </div>
-    </motion.header>
+        </div>
+      </motion.header>
+    </div>
   );
 };
 

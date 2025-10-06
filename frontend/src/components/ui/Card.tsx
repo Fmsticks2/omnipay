@@ -6,26 +6,22 @@ interface CardProps {
   children: ReactNode;
   className?: string;
   hover?: boolean;
-  gradient?: boolean;
 }
 
-const Card = ({ children, className = '', hover = true, gradient = false }: CardProps): FunctionComponent => {
-  const baseClasses = `
-    p-6 rounded-2xl border transition-all duration-300
-    ${gradient 
-      ? 'bg-gradient-to-br from-white/10 to-white/5 border-white/20' 
-      : 'bg-white/5 backdrop-blur-sm border-white/10'
-    }
-    ${hover ? 'hover:border-purple-500/30 hover:shadow-lg hover:shadow-purple-500/10' : ''}
-    ${className}
-  `;
-
+const Card = ({ children, className = '', hover = true }: CardProps): FunctionComponent => {
   if (hover) {
     return (
       <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
         whileHover={{ y: -5, scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
-        className={baseClasses}
+        className={`
+          p-6 rounded-2xl border backdrop-blur-sm
+          ${className}
+        `}
+        style={{ backgroundColor: 'rgba(6, 0, 17, 0.3)', borderColor: 'rgba(255, 255, 255, 0.1)' }}
       >
         {children}
       </motion.div>
@@ -33,7 +29,13 @@ const Card = ({ children, className = '', hover = true, gradient = false }: Card
   }
 
   return (
-    <div className={baseClasses}>
+    <div 
+      className={`
+        p-6 rounded-2xl border backdrop-blur-sm
+        ${className}
+      `}
+      style={{ backgroundColor: 'rgba(6, 0, 17, 0.3)', borderColor: 'rgba(255, 255, 255, 0.1)' }}
+    >
       {children}
     </div>
   );

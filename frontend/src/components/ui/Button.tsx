@@ -21,10 +21,17 @@ const Button = ({
   const baseClasses = 'font-semibold rounded-xl transition-all duration-300 flex items-center justify-center gap-2';
   
   const variants = {
-    primary: 'bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:shadow-lg hover:shadow-purple-500/25',
-    secondary: 'bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:shadow-lg hover:shadow-pink-500/25',
+    primary: 'text-white hover:shadow-lg',
+    secondary: 'text-white hover:shadow-lg',
     outline: 'border border-white/20 text-white backdrop-blur-sm hover:bg-white/10',
     ghost: 'text-white hover:bg-white/10'
+  };
+
+  const getButtonStyle = (variant: string) => {
+    if (variant === 'primary' || variant === 'secondary') {
+      return { backgroundColor: '#060011', border: '1px solid rgba(255,255,255,0.2)' };
+    }
+    return {};
   };
 
   const sizes = {
@@ -46,6 +53,7 @@ const Button = ({
         ${isDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
         ${className}
       `}
+      style={getButtonStyle(variant)}
       disabled={isDisabled}
       {...props}
     >

@@ -61,13 +61,12 @@ const SubscriptionsPage = (): FunctionComponent => {
       <Layout>
         <div className="min-h-screen flex items-center justify-center py-20 px-6">
           <Card className="p-8 text-center max-w-md mx-auto">
-            <div className="mb-6">
-              <Icon icon={UI_ICONS.wallet} size={64} className="mx-auto mb-4 text-blue-400" />
-              <h1 className="text-2xl font-bold text-white mb-4">Connect Your Wallet</h1>
-              <p className="text-gray-300 mb-6">Connect your wallet to manage subscriptions</p>
-            </div>
-            <ConnectButton />
-          </Card>
+              <div className="text-center py-8">
+                <h2 className="text-2xl font-bold text-white mb-4">Connect Your Wallet</h2>
+                <p className="text-gray-300 mb-6">Please connect your wallet to manage your subscriptions.</p>
+                <ConnectButton />
+              </div>
+            </Card>
         </div>
       </Layout>
     );
@@ -103,7 +102,7 @@ const SubscriptionsPage = (): FunctionComponent => {
             className="text-center mb-12"
           >
             <div className="flex items-center justify-center space-x-3 mb-6">
-              <Icon icon={UI_ICONS.subscriptions} size={48} className="text-blue-400" />
+              <Icon icon={UI_ICONS.subscriptions} size={48} className="text-white" />
               <h1 className="text-4xl md:text-5xl font-bold text-white">
                 Smart Subscriptions
               </h1>
@@ -123,7 +122,7 @@ const SubscriptionsPage = (): FunctionComponent => {
                   <p className="text-sm text-gray-400">Connected to {chainMetadata?.name}</p>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Icon icon={UI_ICONS.wallet} size={16} className="text-blue-400" />
+                  <Icon icon={UI_ICONS.wallet} size={16} className="text-white" />
                   <p className="text-lg font-semibold text-white">
                     {balance?.formatted} {balance?.symbol}
                   </p>
@@ -139,9 +138,14 @@ const SubscriptionsPage = (): FunctionComponent => {
                 onClick={() => setActiveTab('create')}
                 className={`px-6 py-3 rounded-lg font-medium transition-all flex items-center space-x-2 ${
                   activeTab === 'create'
-                    ? 'bg-blue-600 text-white'
-                    : 'text-gray-300 hover:text-white hover:bg-white/10'
-                }`}
+                    ? 'text-white'
+                    : 'text-gray-400'
+                } transition-colors`}
+                style={
+                  activeTab === 'create'
+                    ? { backgroundColor: '#060011', border: '1px solid rgba(255, 255, 255, 0.4)' }
+                    : {}
+                }
               >
                 <Icon icon={UI_ICONS.add} size={16} />
                 <span>Create Subscription</span>
@@ -150,9 +154,14 @@ const SubscriptionsPage = (): FunctionComponent => {
                 onClick={() => setActiveTab('manage')}
                 className={`px-6 py-3 rounded-lg font-medium transition-all flex items-center space-x-2 ${
                   activeTab === 'manage'
-                    ? 'bg-blue-600 text-white'
-                    : 'text-gray-300 hover:text-white hover:bg-white/10'
-                }`}
+                    ? 'text-white'
+                    : 'text-gray-400'
+                } transition-colors`}
+                style={
+                  activeTab === 'manage'
+                    ? { backgroundColor: '#060011', border: '1px solid rgba(255, 255, 255, 0.4)' }
+                    : {}
+                }
               >
                 <Icon icon={UI_ICONS.settings} size={16} />
                 <span>Manage Subscriptions</span>
@@ -168,10 +177,10 @@ const SubscriptionsPage = (): FunctionComponent => {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.8 }}
               >
-                <Card gradient>
+                <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
                   <div className="flex items-center space-x-2 mb-6">
-                    <Icon icon={UI_ICONS.add} size={24} className="text-blue-400" />
-                    <h2 className="text-2xl font-bold text-white">Create New Subscription</h2>
+                    <Icon icon={UI_ICONS.add} size={24} className="text-blue-600 dark:text-blue-400" />
+                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Create New Subscription</h2>
                   </div>
                   
                   {/* Payment Type */}
@@ -219,7 +228,7 @@ const SubscriptionsPage = (): FunctionComponent => {
                         value={formData.token}
                         onChange={handleInputChange}
                         placeholder="0x..."
-                        className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 transition-colors"
+                        className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-white/40 transition-colors"
                       />
                     </div>
                   )}
@@ -236,7 +245,7 @@ const SubscriptionsPage = (): FunctionComponent => {
                       value={formData.description}
                       onChange={handleInputChange}
                       placeholder="Netflix subscription, SaaS service, etc."
-                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 transition-colors"
+                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-white/40 transition-colors"
                     />
                   </div>
 
@@ -252,7 +261,7 @@ const SubscriptionsPage = (): FunctionComponent => {
                       value={formData.merchant}
                       onChange={handleInputChange}
                       placeholder="0x..."
-                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 transition-colors"
+                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-white/40 transition-colors"
                     />
                   </div>
 
@@ -269,7 +278,7 @@ const SubscriptionsPage = (): FunctionComponent => {
                       onChange={handleInputChange}
                       placeholder="0.0"
                       step="0.000001"
-                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 transition-colors"
+                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-white/40 transition-colors"
                     />
                   </div>
 
@@ -280,7 +289,7 @@ const SubscriptionsPage = (): FunctionComponent => {
                       name="interval"
                       value={formData.interval}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:border-purple-500 transition-colors"
+                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:border-white/40 transition-colors"
                     >
                       <option value="1">Daily</option>
                       <option value="7">Weekly</option>
@@ -357,8 +366,8 @@ const SubscriptionsPage = (): FunctionComponent => {
                     </div>
                   </div>
 
-                  <div className="mt-6 p-4 bg-blue-900/30 border border-blue-500 rounded-lg">
-                    <p className="text-blue-300 text-sm">
+                  <div className="mt-6 p-4 rounded-lg" style={{ backgroundColor: 'rgba(6, 0, 17, 0.3)', border: '1px solid rgba(255, 255, 255, 0.2)' }}>
+                    <p className="text-gray-300 text-sm">
                       💡 Subscriptions are managed by smart contracts and can be cancelled at any time.
                     </p>
                   </div>
@@ -390,7 +399,7 @@ const SubscriptionsPage = (): FunctionComponent => {
                   <h3 className="text-xl font-bold text-white mb-4">How It Works</h3>
                   <div className="space-y-4">
                     <div className="flex gap-4">
-                      <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm" style={{ backgroundColor: '#060011' }}>
                         1
                       </div>
                       <div>
@@ -399,7 +408,7 @@ const SubscriptionsPage = (): FunctionComponent => {
                       </div>
                     </div>
                     <div className="flex gap-4">
-                      <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm" style={{ backgroundColor: '#060011' }}>
                         2
                       </div>
                       <div>
@@ -408,7 +417,7 @@ const SubscriptionsPage = (): FunctionComponent => {
                       </div>
                     </div>
                     <div className="flex gap-4">
-                      <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm" style={{ backgroundColor: '#060011' }}>
                         3
                       </div>
                       <div>

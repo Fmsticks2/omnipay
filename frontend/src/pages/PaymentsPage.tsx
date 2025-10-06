@@ -13,7 +13,7 @@ import { getChainMetadata } from '../config/chains';
 export default function PaymentsPage() {
   const { address, isConnected, chain } = useAccount();
   const { data: balance } = useBalance({ address });
-  const { sendPayment, isPending, isConfirming, isSuccess, error } = useSendPayment();
+  const { sendPayment, isSuccess, error } = useSendPayment();
 
   const [formData, setFormData] = useState({
     recipient: '',
@@ -50,7 +50,7 @@ export default function PaymentsPage() {
         <div className="min-h-screen flex items-center justify-center p-6">
           <Card className="p-8 text-center max-w-md mx-auto">
             <div className="mb-6">
-              <Icon icon={UI_ICONS.wallet} size={64} className="mx-auto mb-4 text-blue-400" />
+              <Icon icon={UI_ICONS.wallet} size={64} className="mx-auto mb-4 text-white" />
               <h1 className="text-2xl font-bold text-white mb-4">Connect Your Wallet</h1>
               <p className="text-gray-300 mb-6">Connect your wallet to start making cross-chain payments</p>
             </div>
@@ -68,7 +68,7 @@ export default function PaymentsPage() {
           {/* Header */}
           <div className="flex justify-between items-center mb-8">
             <div className="flex items-center space-x-3">
-              <Icon icon={UI_ICONS.send} size={32} className="text-blue-400" />
+              <Icon icon={UI_ICONS.send} size={32} className="text-white" />
               <div>
                 <h1 className="text-3xl font-bold text-white mb-2">Send Payment</h1>
                 <p className="text-gray-300">Send cross-chain payments instantly</p>
@@ -94,7 +94,7 @@ export default function PaymentsPage() {
             {/* Payment Form */}
             <Card className="p-6">
               <div className="flex items-center space-x-2 mb-6">
-                <Icon icon={UI_ICONS.payments} size={24} className="text-blue-400" />
+                <Icon icon={UI_ICONS.payments} size={24} className="text-white" />
                 <h2 className="text-xl font-semibold text-white">Payment Details</h2>
               </div>
               
@@ -109,7 +109,7 @@ export default function PaymentsPage() {
                     value={formData.recipient}
                     onChange={(e) => setFormData({ ...formData, recipient: e.target.value })}
                     placeholder="0x..."
-                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 transition-colors"
+                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-white/40 transition-colors"
                     required
                   />
                 </div>
@@ -125,7 +125,7 @@ export default function PaymentsPage() {
                     value={formData.amount}
                     onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
                     placeholder="0.0"
-                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 transition-colors"
+                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-white/40 transition-colors"
                     required
                   />
                 </div>
@@ -138,18 +138,18 @@ export default function PaymentsPage() {
                   <select
                     value={formData.token}
                     onChange={(e) => setFormData({ ...formData, token: e.target.value })}
-                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:border-blue-500 transition-colors"
+                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:border-white/40 transition-colors"
                   >
-                    <option value="native" className="bg-blue-900">
-                      Native Token ({balance?.symbol})
+                    <option value="native" style={{ backgroundColor: '#060011' }}>
+                      Native Token
                     </option>
-                    <option value="usdc" className="bg-blue-900 flex items-center">
+                    <option value="usdc" style={{ backgroundColor: '#060011' }}>
                       USDC
                     </option>
-                    <option value="usdt" className="bg-blue-900">
+                    <option value="usdt" style={{ backgroundColor: '#060011' }}>
                       USDT
                     </option>
-                    <option value="dai" className="bg-blue-900">
+                    <option value="dai" style={{ backgroundColor: '#060011' }}>
                       DAI
                     </option>
                   </select>
@@ -165,31 +165,18 @@ export default function PaymentsPage() {
                     value={formData.reference}
                     onChange={(e) => setFormData({ ...formData, reference: e.target.value })}
                     placeholder="Payment reference or memo"
-                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 transition-colors"
+                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-white/40 transition-colors"
                   />
                 </div>
 
                 <Button
                   type="submit"
-                  disabled={isPending || isConfirming}
-                  className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-all duration-200 flex items-center justify-center space-x-2"
+                  size="lg"
+                  className="w-full"
+                  disabled={!formData.recipient || !formData.amount}
                 >
-                  {isPending ? (
-                    <>
-                      <Icon icon={UI_ICONS.pending} size={20} className="animate-spin" />
-                      <span>Preparing...</span>
-                    </>
-                  ) : isConfirming ? (
-                    <>
-                      <Icon icon={UI_ICONS.pending} size={20} className="animate-spin" />
-                      <span>Confirming...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Icon icon={UI_ICONS.send} size={20} />
-                      <span>Send Payment</span>
-                    </>
-                  )}
+                  <Icon icon="mdi:send" size={20} />
+                  Send Payment
                 </Button>
               </form>
 
@@ -215,7 +202,7 @@ export default function PaymentsPage() {
             {/* Payment Summary */}
             <Card className="p-6">
               <div className="flex items-center space-x-2 mb-6">
-                <Icon icon="mdi:receipt" size={24} className="text-blue-400" />
+                <Icon icon="mdi:receipt" size={24} className="text-white" />
                 <h2 className="text-xl font-semibold text-white">Payment Summary</h2>
               </div>
               
@@ -288,7 +275,7 @@ export default function PaymentsPage() {
               {/* Quick Actions */}
               <div className="mt-6 pt-6 border-t border-white/10">
                 <h3 className="text-lg font-semibold text-white mb-4 flex items-center space-x-2">
-                  <Icon icon="mdi:lightning-bolt" size={20} className="text-blue-400" />
+                  <Icon icon="mdi:lightning-bolt" size={20} className="text-white" />
                   <span>Quick Actions</span>
                 </h3>
                 <div className="grid grid-cols-2 gap-3">
@@ -309,8 +296,8 @@ export default function PaymentsPage() {
                 </div>
               </div>
 
-              <div className="mt-6 p-4 bg-blue-900/30 border border-blue-500 rounded-lg">
-                <p className="text-blue-300 text-sm">
+              <div className="mt-6 p-4 rounded-lg" style={{ backgroundColor: 'rgba(6, 0, 17, 0.3)', border: '1px solid rgba(255, 255, 255, 0.2)' }}>
+                <p className="text-gray-300 text-sm">
                   💡 Cross-chain payments are processed through OmniPay's bridge network for maximum security and efficiency.
                 </p>
               </div>

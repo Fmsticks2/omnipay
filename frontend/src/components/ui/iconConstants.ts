@@ -1,29 +1,35 @@
-// Token icon mappings - Using professional SVG icons
+// Token icon mappings - Using iconify icons for better compatibility
 export const TOKEN_ICONS = {
-  ETH: '/src/assets/icons/ethereum.svg',
-  USDC: '/src/assets/icons/usdc.svg',
-  USDT: '/src/assets/icons/usdt.svg',
+  ETH: 'cryptocurrency:eth',
+  USDC: 'cryptocurrency:usdc',
+  USDT: 'cryptocurrency:usdt',
   DAI: 'cryptocurrency:dai',
   WBTC: 'cryptocurrency:wbtc',
-  MATIC: '/src/assets/icons/polygon.svg',
-  BNB: '/src/assets/icons/bsc.svg',
+  MATIC: 'cryptocurrency:matic',
+  BNB: 'cryptocurrency:bnb',
   AVAX: 'cryptocurrency:avax',
   FTM: 'cryptocurrency:ftm',
-  ARB: '/src/assets/icons/arbitrum.svg',
-  OP: '/src/assets/icons/optimism.svg',
+  ARB: 'cryptocurrency:arb',
+  OP: 'cryptocurrency:op',
+  // Push Protocol Donut token
+  PUSH: 'cryptocurrency:push',
   // Add more tokens as needed
 } as const;
 
-// Chain icon mappings - Using professional SVG icons
+// Chain icon mappings - Using iconify icons for better compatibility
 export const CHAIN_ICONS = {
-  ethereum: '/src/assets/icons/ethereum.svg',
-  polygon: '/src/assets/icons/polygon.svg',
-  bsc: '/src/assets/icons/bsc.svg',
+  ethereum: 'cryptocurrency:eth',
+  polygon: 'cryptocurrency:matic',
+  bsc: 'cryptocurrency:bnb',
   avalanche: 'cryptocurrency:avax',
   fantom: 'cryptocurrency:ftm',
-  arbitrum: '/src/assets/icons/arbitrum.svg',
-  optimism: '/src/assets/icons/optimism.svg',
-  base: '/src/assets/icons/base.svg',
+  arbitrum: 'cryptocurrency:arb',
+  optimism: 'cryptocurrency:op',
+  base: 'cryptocurrency:base',
+  // Push Protocol testnet
+  push: 'cryptocurrency:push',
+  // Sepolia testnet (using ETH icon)
+  sepolia: 'cryptocurrency:eth',
 } as const;
 
 // Common UI icons

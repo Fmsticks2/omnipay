@@ -17,8 +17,8 @@ export default function Icon({
   color, 
   onClick 
 }: IconProps) {
-  // Check if it's an SVG path (starts with /)
-  if (icon.startsWith('/')) {
+  // Check if it's an SVG path (starts with / or public path)
+  if (icon.startsWith('/') || icon.includes('.svg')) {
     return (
       <img
         src={icon}

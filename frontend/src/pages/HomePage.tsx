@@ -37,14 +37,14 @@ const HomePage = (): FunctionComponent => {
               transition={{ duration: 0.6, delay: 0.1 }}
               viewport={{ once: true }}
             >
-              <Card gradient>
+              <Card>
                 <div className="text-center">
-                  <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mb-6 mx-auto">
-                    <Icon icon={UI_ICONS.security} size={32} className="text-white" />
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center" style={{ backgroundColor: 'rgba(6, 0, 17, 0.5)', border: '1px solid rgba(255, 255, 255, 0.2)' }}>
+                    <Icon icon="mdi:shield-check" size={32} color="white" />
                   </div>
-                  <h3 className="text-xl font-bold text-white mb-4">Secure & Trustless</h3>
+                  <h3 className="text-xl font-bold text-white mb-3">Secure & Trustless</h3>
                   <p className="text-gray-400 text-sm leading-relaxed">
-                    Built on battle-tested smart contracts with multi-layer security protocols and decentralized architecture.
+                    Built on battle-tested smart contracts with multi-signature security and decentralized validation.
                   </p>
                 </div>
               </Card>
@@ -56,17 +56,17 @@ const HomePage = (): FunctionComponent => {
               transition={{ duration: 0.6, delay: 0.2 }}
               viewport={{ once: true }}
             >
-              <Card gradient>
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mb-6 mx-auto">
-                    <Icon icon={UI_ICONS.speed} size={32} className="text-white" />
-                  </div>
-                  <h3 className="text-xl font-bold text-white mb-4">Lightning Fast</h3>
-                  <p className="text-gray-400 text-sm leading-relaxed">
-                    Experience near-instant transactions with optimized gas usage and advanced layer-2 integration.
-                  </p>
+              <Card>
+              <div className="text-center">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center" style={{ backgroundColor: 'rgba(6, 0, 17, 0.5)', border: '1px solid rgba(255, 255, 255, 0.2)' }}>
+                  <Icon icon="mdi:flash" size={32} color="white" />
                 </div>
-              </Card>
+                <h3 className="text-xl font-bold text-white mb-3">Lightning Fast</h3>
+                <p className="text-gray-400 text-sm leading-relaxed">
+                  Sub-second transaction confirmations with optimized routing and parallel processing.
+                </p>
+              </div>
+            </Card>
             </motion.div>
 
             <motion.div
@@ -75,14 +75,14 @@ const HomePage = (): FunctionComponent => {
               transition={{ duration: 0.6, delay: 0.3 }}
               viewport={{ once: true }}
             >
-              <Card gradient>
+              <Card>
                 <div className="text-center">
-                  <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mb-6 mx-auto">
-                    <Icon icon={UI_ICONS.network} size={32} className="text-white" />
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center" style={{ backgroundColor: 'rgba(6, 0, 17, 0.5)', border: '1px solid rgba(255, 255, 255, 0.2)' }}>
+                    <Icon icon="mdi:link-variant" size={32} color="white" />
                   </div>
-                  <h3 className="text-xl font-bold text-white mb-4">Multi-Chain</h3>
+                  <h3 className="text-xl font-bold text-white mb-3">Multi-Chain</h3>
                   <p className="text-gray-400 text-sm leading-relaxed">
-                    Seamlessly operate across Ethereum, Polygon, BSC, and other major blockchain networks.
+                    Seamlessly bridge assets across 15+ blockchains with unified liquidity pools.
                   </p>
                 </div>
               </Card>
@@ -102,25 +102,25 @@ const HomePage = (): FunctionComponent => {
             className="grid grid-cols-1 md:grid-cols-4 gap-8 text-center"
           >
             <div>
-              <h3 className="text-4xl md:text-5xl font-bold text-blue-400 mb-2">
+              <h3 className="text-4xl md:text-5xl font-bold text-white mb-2">
                 $50M+
               </h3>
               <p className="text-gray-400 text-base">Total Volume Processed</p>
             </div>
             <div>
-              <h3 className="text-4xl md:text-5xl font-bold text-blue-400 mb-2">
+              <h3 className="text-4xl md:text-5xl font-bold text-white mb-2">
                 100K+
               </h3>
               <p className="text-gray-400 text-base">Active Users</p>
             </div>
             <div>
-              <h3 className="text-4xl md:text-5xl font-bold text-blue-400 mb-2">
+              <h3 className="text-4xl md:text-5xl font-bold text-white mb-2">
                 15+
               </h3>
               <p className="text-gray-400 text-base">Supported Networks</p>
             </div>
             <div>
-              <h3 className="text-4xl md:text-5xl font-bold text-blue-400 mb-2">
+              <h3 className="text-4xl md:text-5xl font-bold text-white mb-2">
                 99.9%
               </h3>
               <p className="text-gray-400 text-base">Uptime</p>

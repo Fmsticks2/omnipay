@@ -8,14 +8,15 @@ const Footer = (): FunctionComponent => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.6, delay: 0.3 }}
-      className="bg-blue-900 text-white"
+      className="text-white"
+      style={{ backgroundColor: '#060011' }}
     >
       <div className="container mx-auto px-6 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand */}
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center space-x-3 mb-4">
-              <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: '#060011', border: '1px solid rgba(255,255,255,0.2)' }}>
                 <Icon icon="mdi:wallet" size={24} color="white" />
               </div>
               <span className="text-2xl font-bold text-white">

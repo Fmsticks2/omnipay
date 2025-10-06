@@ -97,9 +97,14 @@ const SettlementPage = (): FunctionComponent => {
                 onClick={() => setActiveTab('create')}
                 className={`px-6 py-3 rounded-lg font-medium transition-all ${
                   activeTab === 'create'
-                    ? 'bg-blue-600 text-white'
-                    : 'text-gray-300 hover:text-white'
-                }`}
+                    ? 'text-white'
+                    : 'text-gray-400'
+                } transition-colors`}
+                style={
+                  activeTab === 'create'
+                    ? { backgroundColor: '#060011', border: '1px solid rgba(255, 255, 255, 0.4)' }
+                    : {}
+                }
               >
                 Create Settlement
               </button>
@@ -107,9 +112,14 @@ const SettlementPage = (): FunctionComponent => {
                 onClick={() => setActiveTab('manage')}
                 className={`px-6 py-3 rounded-lg font-medium transition-all ${
                   activeTab === 'manage'
-                    ? 'bg-blue-600 text-white'
-                    : 'text-gray-300 hover:text-white'
-                }`}
+                    ? 'text-white'
+                    : 'text-gray-400'
+                } transition-colors`}
+                style={
+                  activeTab === 'manage'
+                    ? { backgroundColor: '#060011', border: '1px solid rgba(255, 255, 255, 0.4)' }
+                    : {}
+                }
               >
                 Manage Settlements
               </button>
@@ -125,7 +135,7 @@ const SettlementPage = (): FunctionComponent => {
                 transition={{ duration: 0.8 }}
                 className="lg:col-span-2"
               >
-                <Card gradient>
+                <Card>
                   <h2 className="text-2xl font-bold text-white mb-6">Create Batch Settlement</h2>
                   
                   {/* Settlement Details */}
@@ -161,9 +171,14 @@ const SettlementPage = (): FunctionComponent => {
                           onClick={() => setSettlementData({...settlementData, token: 'ETH'})}
                           className={`flex-1 py-3 px-4 rounded-xl font-medium transition-all ${
                             settlementData.token === 'ETH'
-                              ? 'bg-blue-600 text-white'
-                              : 'bg-white/10 text-gray-300 hover:bg-white/20'
-                          }`}
+                              ? 'text-white'
+                              : 'text-gray-400'
+                          } transition-colors`}
+                          style={
+                            settlementData.token === 'ETH'
+                              ? { backgroundColor: '#060011', border: '1px solid rgba(255, 255, 255, 0.4)' }
+                              : {}
+                          }
                         >
                           ETH
                         </button>
@@ -171,9 +186,14 @@ const SettlementPage = (): FunctionComponent => {
                           onClick={() => setSettlementData({...settlementData, token: 'ERC20'})}
                           className={`flex-1 py-3 px-4 rounded-xl font-medium transition-all ${
                             settlementData.token === 'ERC20'
-                              ? 'bg-blue-600 text-white'
-                              : 'bg-white/10 text-gray-300 hover:bg-white/20'
-                          }`}
+                              ? 'text-white'
+                              : 'text-gray-400'
+                          } transition-colors`}
+                          style={
+                            settlementData.token === 'ERC20'
+                              ? { backgroundColor: '#060011', border: '1px solid rgba(255, 255, 255, 0.4)' }
+                              : {}
+                          }
                         >
                           ERC20
                         </button>
@@ -316,7 +336,7 @@ const SettlementPage = (): FunctionComponent => {
                   <h3 className="text-xl font-bold text-white mb-4">How It Works</h3>
                   <div className="space-y-4">
                     <div className="flex gap-4">
-                      <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm" style={{ backgroundColor: '#060011' }}>
                         1
                       </div>
                       <div>
@@ -325,7 +345,7 @@ const SettlementPage = (): FunctionComponent => {
                       </div>
                     </div>
                     <div className="flex gap-4">
-                      <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm" style={{ backgroundColor: '#060011' }}>
                         2
                       </div>
                       <div>
@@ -334,7 +354,7 @@ const SettlementPage = (): FunctionComponent => {
                       </div>
                     </div>
                     <div className="flex gap-4">
-                      <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm" style={{ backgroundColor: '#060011' }}>
                         3
                       </div>
                       <div>
@@ -373,10 +393,15 @@ const SettlementPage = (): FunctionComponent => {
                             <div className="flex items-center gap-4 mb-2">
                               <h3 className="text-xl font-semibold text-white">{settlement.title}</h3>
                               <span className={`px-3 py-1 rounded-full text-sm ${
-                                settlement.status === 'active' 
-                                  ? 'bg-blue-500/20 text-blue-400' 
-                                  : 'bg-green-500/20 text-green-400'
-                              }`}>
+                                settlement.status === 'active'
+                                  ? 'text-white'
+                                  : 'text-gray-400'
+                              } transition-colors`}
+                              style={
+                                settlement.status === 'active'
+                                  ? { backgroundColor: 'rgba(6, 0, 17, 0.2)', color: 'white' }
+                                  : {}
+                              }>
                                 {settlement.status}
                               </span>
                             </div>
@@ -395,8 +420,11 @@ const SettlementPage = (): FunctionComponent => {
                           </div>
                           <div className="w-full bg-white/10 rounded-full h-2">
                             <div 
-                              className="bg-blue-500 h-2 rounded-full transition-all"
-                              style={{ width: `${(settlement.completed / settlement.recipients) * 100}%` }}
+                              className="h-2 rounded-full transition-all" 
+                              style={{ 
+                                backgroundColor: '#060011',
+                                width: `${(settlement.completed / settlement.recipients) * 100}%` 
+                              }}
                             />
                           </div>
                         </div>

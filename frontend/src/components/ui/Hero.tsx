@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { Link } from '@tanstack/react-router';
 import type { FunctionComponent } from '../../common/types';
 import Icon from './Icon';
+import Button from './Button';
 import { UI_ICONS } from './iconConstants';
 
 const Hero = (): FunctionComponent => {
@@ -16,30 +17,22 @@ const Hero = (): FunctionComponent => {
         </div>
       </div>
 
-      {/* Floating Elements */}
-      <motion.div
-        animate={{
-          y: [0, -20, 0],
-          rotate: [0, 5, 0],
-        }}
-        transition={{
-          duration: 6,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-        className="absolute top-20 left-10 w-20 h-20 bg-blue-400/20 rounded-full blur-xl"
+      {/* Animated Background Elements */}
+      <div
+        className="absolute top-20 left-10 w-20 h-20 rounded-full blur-xl"
+        style={{ backgroundColor: 'rgba(6, 0, 17, 0.4)' }}
       />
-      <motion.div
-        animate={{
-          y: [0, 30, 0],
-          rotate: [0, -5, 0],
-        }}
-        transition={{
-          duration: 8,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-        className="absolute bottom-20 right-10 w-32 h-32 bg-blue-600/20 rounded-full blur-xl"
+      <div
+        className="absolute top-40 right-20 w-16 h-16 rounded-full blur-xl"
+        style={{ backgroundColor: 'rgba(6, 0, 17, 0.3)' }}
+      />
+      <div
+        className="absolute bottom-20 left-20 w-24 h-24 rounded-full blur-xl"
+        style={{ backgroundColor: 'rgba(6, 0, 17, 0.5)' }}
+      />
+      <div
+        className="absolute bottom-20 right-10 w-32 h-32 rounded-full blur-xl"
+        style={{ backgroundColor: 'rgba(6, 0, 17, 0.4)' }}
       />
 
       <div className="container mx-auto px-6 text-center relative z-10">
@@ -56,7 +49,7 @@ const Hero = (): FunctionComponent => {
           >
             The Future of
             <br />
-            <span className="text-blue-400">
+            <span className="text-white">
               Cross-Chain Payments
             </span>
           </motion.h1>
@@ -78,14 +71,18 @@ const Hero = (): FunctionComponent => {
             transition={{ duration: 0.8, delay: 0.6 }}
           >
             <Link to="/payments">
-              <motion.button
+              <motion.div
                 whileHover={{ scale: 1.05, boxShadow: "0 20px 40px rgba(59, 130, 246, 0.3)" }}
                 whileTap={{ scale: 0.95 }}
-                className="px-8 py-4 bg-blue-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-blue-500/25 transition-all duration-300 flex items-center"
               >
-                <Icon icon={UI_ICONS.payment} size={20} className="mr-2" />
-                Start Paying
-              </motion.button>
+                <Button
+                  size="lg"
+                  className="text-white font-semibold shadow-lg transition-all duration-300 flex items-center"
+                >
+                  Start Paying
+                  <Icon icon="mdi:arrow-right" size={20} />
+                </Button>
+              </motion.div>
             </Link>
             
             <motion.button
@@ -106,38 +103,29 @@ const Hero = (): FunctionComponent => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.8 }}
         >
-          <motion.div
-            whileHover={{ y: -10, scale: 1.02 }}
-            className="p-6 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 hover:border-blue-500/30 transition-all duration-300"
-          >
-            <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center mb-4 mx-auto">
-              <Icon icon={UI_ICONS.speed} size={24} className="text-white" />
+          <div className="p-6 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 hover:border-white/30 transition-all duration-300">
+            <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 mx-auto" style={{ backgroundColor: 'rgba(6, 0, 17, 0.5)', border: '1px solid rgba(255, 255, 255, 0.2)' }}>
+              <Icon icon="mdi:shield-check" size={24} color="white" />
             </div>
-            <h3 className="text-xl font-semibold text-white mb-2">Instant Payments</h3>
-            <p className="text-gray-400">Send and receive payments instantly across multiple blockchains with minimal fees.</p>
-          </motion.div>
+            <h3 className="text-lg font-bold text-white mb-2 text-center">Secure</h3>
+            <p className="text-gray-400 text-sm text-center">Battle-tested smart contracts</p>
+          </div>
 
-          <motion.div
-            whileHover={{ y: -10, scale: 1.02 }}
-            className="p-6 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 hover:border-blue-500/30 transition-all duration-300"
-          >
-            <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center mb-4 mx-auto">
-              <Icon icon={UI_ICONS.subscription} size={24} className="text-white" />
+          <div className="p-6 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 hover:border-white/30 transition-all duration-300">
+            <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 mx-auto" style={{ backgroundColor: 'rgba(6, 0, 17, 0.5)', border: '1px solid rgba(255, 255, 255, 0.2)' }}>
+              <Icon icon="mdi:flash" size={24} color="white" />
             </div>
-            <h3 className="text-xl font-semibold text-white mb-2">Smart Subscriptions</h3>
-            <p className="text-gray-400">Automate recurring payments with intelligent subscription management.</p>
-          </motion.div>
+            <h3 className="text-lg font-bold text-white mb-2 text-center">Fast</h3>
+            <p className="text-gray-400 text-sm text-center">Sub-second confirmations</p>
+          </div>
 
-          <motion.div
-            whileHover={{ y: -10, scale: 1.02 }}
-            className="p-6 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 hover:border-blue-500/30 transition-all duration-300"
-          >
-            <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center mb-4 mx-auto">
-              <Icon icon={UI_ICONS.bridge} size={24} className="text-white" />
+          <div className="p-6 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 hover:border-white/30 transition-all duration-300">
+            <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 mx-auto" style={{ backgroundColor: 'rgba(6, 0, 17, 0.5)', border: '1px solid rgba(255, 255, 255, 0.2)' }}>
+              <Icon icon="mdi:link-variant" size={24} color="white" />
             </div>
-            <h3 className="text-xl font-semibold text-white mb-2">Cross-Chain Bridge</h3>
-            <p className="text-gray-400">Seamlessly bridge assets and payments between different blockchain networks.</p>
-          </motion.div>
+            <h3 className="text-lg font-bold text-white mb-2 text-center">Multi-Chain</h3>
+            <p className="text-gray-400 text-sm text-center">15+ supported networks</p>
+          </div>
         </motion.div>
       </div>
     </section>
