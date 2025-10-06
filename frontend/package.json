@@ -42,6 +42,8 @@
     "preview": "vite preview",
     "deploy:staging": "npm run build && echo 'Deploy to staging environment'",
     "deploy:production": "npm run build:production && echo 'Deploy to production environment'",
+    "netlify:build": "npm run build:production",
+    "netlify:dev": "npm run dev",
     "contracts:compile": "echo 'Compile smart contracts - integrate with Hardhat/Foundry'",
     "contracts:deploy": "echo 'Deploy smart contracts to network'",
     "commitlint": "commitlint --edit",
