@@ -1,21 +1,32 @@
 import { mainnet, polygon, optimism, arbitrum, base, hardhat } from 'wagmi/chains';
 import { NETWORK_CONFIG } from './contracts';
 
-// Define the local Hardhat network
-export const localHardhat = {
-  ...hardhat,
+// Define the Push testnet network
+export const pushTestnet = {
   id: NETWORK_CONFIG.chainId,
-  name: 'Local Hardhat',
+  name: 'Push Testnet Donut',
+  nativeCurrency: {
+    decimals: 18,
+    name: 'Push Coin',
+    symbol: 'PC',
+  },
   rpcUrls: {
     default: {
-      http: ['http://127.0.0.1:8545'],
+      http: ['https://evm.rpc-testnet-donut-node1.push.org'],
     },
   },
+  blockExplorers: {
+    default: {
+      name: 'Push Explorer',
+      url: 'https://testnet-explorer.push.org',
+    },
+  },
+  testnet: true,
 } as const;
 
 // All supported chains for OmniPay
 export const supportedChains = [
-  localHardhat,
+  pushTestnet,
   mainnet,
   polygon,
   optimism,
@@ -55,11 +66,11 @@ export const chainMetadata = {
     color: '#0052FF',
     logo: '🔵',
   },
-  [localHardhat.id]: {
-    name: 'Local Hardhat',
-    shortName: 'LOCAL',
-    color: '#F7DF1E',
-    logo: '⚡',
+  [pushTestnet.id]: {
+    name: 'Push Testnet',
+    shortName: 'PUSH',
+    color: '#E91E63',
+    logo: '🚀',
   },
 } as const;
 

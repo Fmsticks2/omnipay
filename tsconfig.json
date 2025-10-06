@@ -14,7 +14,13 @@
     "declarationMap": true,
     "outDir": "./dist",
     "rootDir": "./",
-    "typeRoots": ["./node_modules/@types", "./typechain-types"]
+    "typeRoots": ["./node_modules/@types"],
+    "baseUrl": "./",
+    "paths": {
+      "@openzeppelin/*": ["./typechain-types/@openzeppelin/*"],
+      "contracts/*": ["./typechain-types/contracts/*"],
+      "factories/*": ["./typechain-types/factories/*"]
+    }
   },
   "include": [
     "./scripts/**/*",

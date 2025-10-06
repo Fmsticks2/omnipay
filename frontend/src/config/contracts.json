@@ -1,14 +1,14 @@
 {
-  "network": "localhost",
-  "chainId": "31337",
-  "deployer": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+  "network": "push_donut",
+  "chainId": "42101",
+  "deployer": "0x5CbD1ABe5029c5c717038f86C31B706f027640AB",
   "contracts": {
-    "OmniPayNotifier": "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9",
-    "OmniPayCore": "0x5FC8d32690cc91D4c39d9d3abcBD16989F875707",
-    "OmniPaySubscription": "0x0165878A594ca255338adfa4d48449f69242Eb8F",
-    "OmniPaySettlement": "0xa513E6E4b8f2a923D98304ec87F64353C4D5C853",
-    "OmniPayBridge": "0x2279B7A0a67DB372996a5FaB50D91eAA73d2eBe6",
-    "OmniPayBridgeStub": "0x8A791620dd6260079BF849Dc5567aDC3F2FdC318"
+    "OmniPayNotifier": "0xA4d4CA5139e7e0ec8454a04AD8E0E7f7B2E1A662",
+    "OmniPayCore": "0x24D9d6A5149BcACcc46582A21EDCdf47e8353595",
+    "OmniPaySubscription": "0x9b015C8bbD861A0515dd7A479CD980C3A7B8A5b6",
+    "OmniPaySettlement": "0x52dFbFb18909f4045BEaA24D338A91223d5799e3",
+    "OmniPayBridge": "0x5603d4cF0800C045C110A4463Ed9478bF118202F",
+    "OmniPayBridgeStub": "0x48861Fa35f33485DfAC81d8c7A87Ed1f944eB08f"
   },
-  "deployedAt": "2025-10-06T19:23:03.042Z"
+  "deployedAt": "2025-10-06T19:40:37.446Z"
 }
