@@ -1,26 +1,38 @@
-import { dirname } from "path";
-import { fileURLToPath } from "url";
-import { FlatCompat } from "@eslint/eslintrc";
+import js from '@eslint/js';
+import typescript from '@typescript-eslint/eslint-plugin';
+import typescriptParser from '@typescript-eslint/parser';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-});
-
-const eslintConfig = [
-  ...compat.extends("@eslint/recommended", "@typescript-eslint/recommended"),
+export default [
+  js.configs.recommended,
+  {
+    files: ['**/*.{ts,tsx}'],
+    languageOptions: {
+      parser: typescriptParser,
+      parserOptions: {
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+        ecmaFeatures: {
+          jsx: true,
+        },
+      },
+    },
+    plugins: {
+      '@typescript-eslint': typescript,
+    },
+    rules: {
+      ...typescript.configs.recommended.rules,
+    },
+  },
   {
     ignores: [
-      "node_modules/**",
-      "dist/**",
-      "build/**",
-      "artifacts/**",
-      "cache/**",
-      "typechain-types/**",
+      'node_modules/**',
+      'dist/**',
+      'build/**',
+      'artifacts/**',
+      'cache/**',
+      'typechain-types/**',
     ],
   },
 ];
 
-export default eslintConfig;
+
