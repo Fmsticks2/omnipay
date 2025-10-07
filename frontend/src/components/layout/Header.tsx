@@ -39,6 +39,13 @@ export default function Header() {
               <span>Bridge</span>
             </Link>
             <Link 
+              to="/payments" 
+              className="flex items-center space-x-1.5 text-gray-300 hover:text-white transition-colors text-sm"
+            >
+              <Icon icon={UI_ICONS.send} size={16} />
+              <span>Payments</span>
+            </Link>
+            <Link 
               to="/faucet" 
               className="flex items-center space-x-1.5 text-gray-300 hover:text-white transition-colors text-sm"
             >

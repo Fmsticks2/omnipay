@@ -1,7 +1,8 @@
 import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAccount, useBalance } from 'wagmi';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
+import { toast } from 'react-hot-toast';
 import type { FunctionComponent } from '../common/types';
 import Layout from '../components/layout/Layout';
 import Card from '../components/ui/Card';
@@ -55,10 +56,33 @@ const AVAILABLE_TOKENS = [
 const SubscriptionsPage = (): FunctionComponent => {
   const { address, isConnected, chain } = useAccount();
   const { data: balance } = useBalance({ address });
-  const { createSubscription, isPending, isConfirming, isSuccess, error } = useCreateSubscription();
-  const { subscriptions, isLoading: isLoadingSubscriptions } = useUserSubscriptions(address);
-  const { cancelSubscription, isPending: isCanceling } = useCancelSubscription();
-  const { executeSubscription, isPending: isExecuting } = useExecuteSubscription();
+  
+  // Smart contract hooks
+  const { 
+    createSubscription, 
+    isPending: isCreating, 
+    isSuccess: createSuccess, 
+    error: createErrorDetails 
+  } = useCreateSubscription();
+  
+  const { 
+    subscriptions: userSubscriptions, 
+    isLoading: subscriptionsLoading 
+  } = useUserSubscriptions(address);
+  
+  const { 
+    cancelSubscription, 
+    isPending: isCanceling, 
+    isSuccess: cancelSuccess, 
+    error: cancelError 
+  } = useCancelSubscription();
+  
+  const { 
+    executeSubscription, 
+    isPending: isExecuting, 
+    isSuccess: executeSuccess, 
+    error: executeError 
+  } = useExecuteSubscription();
   
   const [activeTab, setActiveTab] = useState<'create' | 'manage'>('create');
   const [showTokenSelector, setShowTokenSelector] = useState(false);
@@ -86,15 +110,90 @@ const SubscriptionsPage = (): FunctionComponent => {
     setShowTokenSelector(false);
   };
 
+  // Effect hooks for handling success/error states
+  useEffect(() => {
+    if (createSuccess) {
+      toast.success('Subscription created successfully!');
+      setFormData({
+        merchant: '',
+        token: 'native',
+        amount: '',
+        interval: '30',
+        description: ''
+      });
+      // Note: refetch would be called here if available from the hook
+    }
+  }, [createSuccess]);
+
+  useEffect(() => {
+    if (createErrorDetails) {
+      toast.error(`Failed to create subscription: ${createErrorDetails.message}`);
+    }
+  }, [createErrorDetails]);
+
+  useEffect(() => {
+    if (cancelSuccess) {
+      toast.success('Subscription cancelled successfully!');
+      // Note: refetch would be called here if available from the hook
+    }
+  }, [cancelSuccess]);
+
+  useEffect(() => {
+    if (cancelError) {
+      toast.error('Failed to cancel subscription');
+    }
+  }, [cancelError]);
+
+  useEffect(() => {
+    if (executeSuccess) {
+      toast.success('Subscription executed successfully!');
+      // Note: refetch would be called here if available from the hook
+    }
+  }, [executeSuccess]);
+
+  useEffect(() => {
+    if (executeError) {
+      toast.error('Failed to execute subscription payment');
+    }
+  }, [executeError]);
+
   const handleCreateSubscription = async () => {
-    if (!isConnected || !address) return;
+    if (!isConnected || !address) {
+      toast.error('Please connect your wallet first');
+      return;
+    }
+
+    // Validation
+    if (!formData.merchant.trim()) {
+      toast.error('Please enter a merchant address');
+      return;
+    }
+
+    if (!formData.amount || parseFloat(formData.amount) <= 0) {
+      toast.error('Please enter a valid amount');
+      return;
+    }
+
+    if (!formData.description.trim()) {
+      toast.error('Please enter a description');
+      return;
+    }
 
     try {
+      const selectedToken = AVAILABLE_TOKENS.find(token => 
+        token.address === formData.token || (formData.token === 'native' && token.address === 'native')
+      );
+      if (!selectedToken) {
+        toast.error('Invalid token selected');
+        return;
+      }
+
       const tokenAddress = formData.token === 'native' 
         ? '0x0000000000000000000000000000000000000000' as `0x${string}`
         : formData.token as `0x${string}`;
 
-      const intervalInSeconds = parseInt(formData.interval) * 24 * 60 * 60; // Convert days to seconds
+      // Convert interval from days to seconds
+      const intervalInSeconds = parseInt(formData.interval) * 24 * 60 * 60;
 
       await createSubscription(
         formData.merchant as `0x${string}`,
@@ -104,22 +203,35 @@ const SubscriptionsPage = (): FunctionComponent => {
       );
     } catch (err) {
       console.error('Subscription creation failed:', err);
+      toast.error('Failed to create subscription');
     }
   };
 
   const handleCancelSubscription = async (subscriptionId: bigint) => {
+    if (!isConnected) {
+      toast.error('Please connect your wallet first');
+      return;
+    }
+
     try {
       await cancelSubscription(subscriptionId);
     } catch (err) {
       console.error('Subscription cancellation failed:', err);
+      toast.error('Failed to cancel subscription');
     }
   };
 
   const handleExecuteSubscription = async (subscriptionId: bigint) => {
+    if (!isConnected) {
+      toast.error('Please connect your wallet first');
+      return;
+    }
+
     try {
       await executeSubscription(subscriptionId);
     } catch (err) {
       console.error('Subscription execution failed:', err);
+      toast.error('Failed to execute subscription payment');
     }
   };
 
@@ -346,23 +458,30 @@ const SubscriptionsPage = (): FunctionComponent => {
 
                   <Button 
                     onClick={handleCreateSubscription}
-                    disabled={isPending || isConfirming || !formData.merchant || !formData.amount}
+                    disabled={!isConnected || isCreating || !formData.merchant || !formData.amount || !formData.description}
                     className="w-full"
                     size="lg"
                     variant="secondary"
                   >
-                    {isPending ? 'Preparing...' : isConfirming ? 'Confirming...' : 'Create Subscription'}
+                    {isCreating ? (
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        Creating Subscription...
+                      </div>
+                    ) : (
+                      'Create Subscription'
+                    )}
                   </Button>
                   
-                  {error && (
+                  {createErrorDetails && (
                     <div className="mt-4 p-4 bg-red-900/50 border border-red-500 rounded-xl">
                       <p className="text-red-300 text-sm">
-                        Error: {error?.message || 'An unknown error occurred'}
+                        Error: {createErrorDetails?.message || 'An unknown error occurred'}
                       </p>
                     </div>
                   )}
 
-                  {isSuccess && (
+                  {createSuccess && (
                     <div className="mt-4 p-4 bg-green-900/50 border border-green-500 rounded-xl">
                       <p className="text-green-300 text-sm">
                         Subscription created successfully! 🎉
@@ -496,14 +615,14 @@ const SubscriptionsPage = (): FunctionComponent => {
               <Card>
                 <h2 className="text-2xl font-bold text-white mb-6">Your Subscriptions</h2>
                 
-                {isLoadingSubscriptions ? (
+                {subscriptionsLoading ? (
                   <div className="text-center py-12">
-                    <Icon icon={UI_ICONS.pending} size={48} className="mx-auto mb-4 text-gray-400 animate-spin" />
+                    <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
                     <p className="text-gray-400">Loading your subscriptions...</p>
                   </div>
-                ) : subscriptions && Array.isArray(subscriptions) && subscriptions.length > 0 ? (
+                ) : userSubscriptions && Array.isArray(userSubscriptions) && userSubscriptions.length > 0 ? (
                   <div className="space-y-4">
-                    {subscriptions.map((subscription: any, index: number) => {
+                    {userSubscriptions.map((subscription: any, index: number) => {
                       const tokenInfo = AVAILABLE_TOKENS.find(t => 
                         t.address === subscription.token || 
                         (subscription.token === '0x0000000000000000000000000000000000000000' && t.address === 'native')

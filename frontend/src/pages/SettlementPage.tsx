@@ -1,10 +1,20 @@
 import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAccount } from 'wagmi';
+import { toast } from 'react-hot-toast';
 import type { FunctionComponent } from '../common/types';
 import Layout from '../components/layout/Layout';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
+import { 
+  useCreateSettlement, 
+  useExecuteSettlement, 
+  useCancelSettlement,
+  usePayerSettlements,
+  usePayeeSettlements,
+  useSettlementDetails
+} from '../hooks/useOmniPayContracts';
+import { formatEther } from 'viem';
 
 const SettlementPage = (): FunctionComponent => {
   const { address, isConnected } = useAccount();
@@ -19,6 +29,61 @@ const SettlementPage = (): FunctionComponent => {
     token: 'ETH' as 'ETH' | 'ERC20',
     tokenAddress: ''
   });
+
+  // Smart contract hooks
+  const { createSettlement, isPending: isCreating, isSuccess: isCreateSuccess, error: createError } = useCreateSettlement();
+  const { executeSettlement, isPending: isExecuting, isSuccess: isExecuteSuccess, error: executeError } = useExecuteSettlement();
+  const { cancelSettlement, isPending: isCanceling, isSuccess: isCancelSuccess, error: cancelError } = useCancelSettlement();
+  
+  // Get user's settlements
+  const { settlementIds: payerSettlementIds, isLoading: isLoadingPayerSettlements } = usePayerSettlements(address);
+  const { settlementIds: payeeSettlementIds, isLoading: isLoadingPayeeSettlements } = usePayeeSettlements(address);
+
+  // Handle success/error states
+  useEffect(() => {
+    if (isCreateSuccess) {
+      toast.success('Settlement created successfully!');
+      // Reset form
+      setSettlementData({
+        title: '',
+        description: '',
+        deadline: '',
+        token: 'ETH',
+        tokenAddress: ''
+      });
+      setRecipients([{ address: '', amount: '', token: 'ETH' }]);
+    }
+  }, [isCreateSuccess]);
+
+  useEffect(() => {
+    if (createError) {
+      toast.error(`Settlement creation failed: ${createError.message}`);
+    }
+  }, [createError]);
+
+  useEffect(() => {
+    if (isExecuteSuccess) {
+      toast.success('Settlement executed successfully!');
+    }
+  }, [isExecuteSuccess]);
+
+  useEffect(() => {
+    if (executeError) {
+      toast.error(`Settlement execution failed: ${executeError.message}`);
+    }
+  }, [executeError]);
+
+  useEffect(() => {
+    if (isCancelSuccess) {
+      toast.success('Settlement cancelled successfully!');
+    }
+  }, [isCancelSuccess]);
+
+  useEffect(() => {
+    if (cancelError) {
+      toast.error(`Settlement cancellation failed: ${cancelError.message}`);
+    }
+  }, [cancelError]);
 
   const addRecipient = () => {
     setRecipients([...recipients, { address: '', amount: '', token: settlementData.token }]);
@@ -43,46 +108,140 @@ const SettlementPage = (): FunctionComponent => {
   };
 
   const handleCreateSettlement = async () => {
-    if (!isConnected || !address) return;
-    
+    if (!isConnected || !address) {
+      toast.error('Please connect your wallet first');
+      return;
+    }
+
+    // Validate form data
+    if (!settlementData.title.trim()) {
+      toast.error('Please enter a settlement title');
+      return;
+    }
+
+    if (recipients.some(r => !r.address || !r.amount)) {
+      toast.error('Please fill in all recipient details');
+      return;
+    }
+
+    if (settlementData.token === 'ERC20' && !settlementData.tokenAddress) {
+      toast.error('Please enter the token address for ERC20 payments');
+      return;
+    }
+
     try {
-      // TODO: Implement real settlement creation with wagmi/viem
-      console.log('Creating settlement:', { settlementData, recipients });
-      
-      // This should call the actual smart contract
-      // await writeContract({
-      //   address: OMNIPAY_CONTRACTS.SETTLEMENT,
-      //   abi: CONTRACT_ABIS.SETTLEMENT,
-      //   functionName: 'createSettlement',
-      //   args: [...]
-      // });
+      // For now, create individual settlements for each recipient
+      // In a real implementation, you might want to create a batch settlement
+      for (const recipient of recipients) {
+        if (!recipient.address || !recipient.amount) continue;
+        
+        const tokenAddress = settlementData.token === 'ETH' 
+          ? '0x0000000000000000000000000000000000000000' // ETH address
+          : settlementData.tokenAddress as `0x${string}`;
+
+        await createSettlement(
+          recipient.address as `0x${string}`,
+          tokenAddress,
+          recipient.amount,
+          `${settlementData.title} - ${settlementData.description || 'Settlement payment'}`
+        );
+      }
     } catch (err) {
       console.error('Settlement creation failed:', err);
+      toast.error('Failed to create settlement. Please try again.');
     }
   };
 
-  const mockSettlements = [
-    {
-      id: 1,
-      title: 'Q4 Contractor Payments',
-      totalAmount: '5.5 ETH',
-      recipients: 8,
-      deadline: '2024-11-15',
-      status: 'active',
-      completed: 3,
-      pending: 5
-    },
-    {
-      id: 2,
-      title: 'Marketing Campaign Payouts',
-      totalAmount: '2,500 USDC',
-      recipients: 12,
-      deadline: '2024-10-30',
-      status: 'completed',
-      completed: 12,
-      pending: 0
+  // Component to display individual settlement details
+  const SettlementItem = ({ settlementId }: { settlementId: bigint }) => {
+    const { settlement, isLoading } = useSettlementDetails(settlementId);
+
+    if (isLoading) {
+      return (
+        <div className="p-6 bg-white/5 rounded-xl border border-white/10 animate-pulse">
+          <div className="h-6 bg-white/10 rounded mb-4"></div>
+          <div className="h-4 bg-white/10 rounded mb-2"></div>
+          <div className="h-4 bg-white/10 rounded w-1/2"></div>
+        </div>
+      );
     }
-  ];
+
+    if (!settlement || !Array.isArray(settlement)) return null;
+
+    const [payer, payee, token, amount, paymentRef, status, createdAt] = settlement as [
+      string, string, string, bigint, string, number, bigint
+    ];
+    const isETH = token === '0x0000000000000000000000000000000000000000';
+    const statusText = status === 0 ? 'Pending' : status === 1 ? 'Executed' : 'Cancelled';
+    const statusColor = status === 0 ? 'text-yellow-400' : status === 1 ? 'text-green-400' : 'text-red-400';
+
+    const handleExecute = async () => {
+      try {
+        await executeSettlement(settlementId, isETH, isETH ? formatEther(amount) : undefined);
+      } catch (err) {
+        console.error('Execute settlement failed:', err);
+      }
+    };
+
+    const handleCancel = async () => {
+      try {
+        await cancelSettlement(settlementId);
+      } catch (err) {
+        console.error('Cancel settlement failed:', err);
+      }
+    };
+
+    return (
+      <div className="p-6 bg-white/5 rounded-xl border border-white/10">
+        <div className="flex items-start justify-between mb-4">
+          <div className="flex-1">
+            <div className="flex items-center gap-4 mb-2">
+              <h3 className="text-xl font-semibold text-white">{paymentRef}</h3>
+              <span className={`px-3 py-1 rounded-full text-sm ${statusColor}`}>
+                {statusText}
+              </span>
+            </div>
+            <p className="text-gray-400 mb-2">
+              Amount: {formatEther(amount)} {isETH ? 'ETH' : 'tokens'}
+            </p>
+            <p className="text-gray-400 text-sm">
+              {address?.toLowerCase() === payer.toLowerCase() ? `To: ${payee}` : `From: ${payer}`}
+            </p>
+            <p className="text-gray-400 text-sm">
+              Created: {new Date(Number(createdAt) * 1000).toLocaleDateString()}
+            </p>
+          </div>
+        </div>
+
+        <div className="flex gap-3">
+          <Button size="sm" variant="outline">
+            View Details
+          </Button>
+          {status === 0 && address?.toLowerCase() === payer.toLowerCase() && (
+            <Button 
+              size="sm" 
+              variant="secondary" 
+              onClick={handleExecute}
+              disabled={isExecuting}
+            >
+              {isExecuting ? 'Executing...' : 'Execute Payment'}
+            </Button>
+          )}
+          {status === 0 && (address?.toLowerCase() === payer.toLowerCase() || address?.toLowerCase() === payee.toLowerCase()) && (
+            <Button 
+              size="sm" 
+              variant="outline" 
+              onClick={handleCancel}
+              disabled={isCanceling}
+              className="text-red-400 border-red-400 hover:bg-red-400/10"
+            >
+              {isCanceling ? 'Cancelling...' : 'Cancel'}
+            </Button>
+          )}
+        </div>
+      </div>
+    );
+  };
 
   const totalAmount = recipients.reduce((sum, recipient) => {
     return sum + (parseFloat(recipient.amount) || 0);
@@ -293,8 +452,9 @@ const SettlementPage = (): FunctionComponent => {
                     className="w-full"
                     size="lg"
                     variant="secondary"
+                    disabled={isCreating || !isConnected}
                   >
-                    Create Settlement
+                    {isCreating ? 'Creating Settlement...' : 'Create Settlement'}
                   </Button>
                 </Card>
               </motion.div>
@@ -393,71 +553,36 @@ const SettlementPage = (): FunctionComponent => {
               <Card>
                 <h2 className="text-2xl font-bold text-white mb-6">Your Settlements</h2>
                 
-                {mockSettlements.length === 0 ? (
+                {!isConnected ? (
                   <div className="text-center py-12">
-                    <p className="text-gray-400 mb-4">No settlements created</p>
-                    <Button onClick={() => setActiveTab('create')} variant="outline">
-                      Create Your First Settlement
-                    </Button>
+                    <p className="text-gray-400 mb-4">Connect your wallet to view settlements</p>
+                  </div>
+                ) : isLoadingPayerSettlements || isLoadingPayeeSettlements ? (
+                  <div className="text-center py-12">
+                    <p className="text-gray-400 mb-4">Loading settlements...</p>
                   </div>
                 ) : (
-                  <div className="space-y-6">
-                    {mockSettlements.map((settlement) => (
-                      <div key={settlement.id} className="p-6 bg-white/5 rounded-xl border border-white/10">
-                        <div className="flex items-start justify-between mb-4">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-4 mb-2">
-                              <h3 className="text-xl font-semibold text-white">{settlement.title}</h3>
-                              <span className={`px-3 py-1 rounded-full text-sm ${
-                                settlement.status === 'active'
-                                  ? 'text-white'
-                                  : 'text-gray-400'
-                              } transition-colors`}
-                              style={
-                                settlement.status === 'active'
-                                  ? { backgroundColor: 'rgba(6, 0, 17, 0.2)', color: 'white' }
-                                  : {}
-                              }>
-                                {settlement.status}
-                              </span>
-                            </div>
-                            <p className="text-gray-400 mb-2">
-                              Total: {settlement.totalAmount} • {settlement.recipients} recipients
-                            </p>
-                            <p className="text-gray-400 text-sm">Deadline: {settlement.deadline}</p>
-                          </div>
-                        </div>
+                  (() => {
+                    const allSettlementIds = [
+                      ...(Array.isArray(payerSettlementIds) ? payerSettlementIds as bigint[] : []),
+                      ...(Array.isArray(payeeSettlementIds) ? payeeSettlementIds as bigint[] : [])
+                    ].filter((id, index, arr) => arr.indexOf(id) === index); // Remove duplicates
 
-                        {/* Progress Bar */}
-                        <div className="mb-4">
-                          <div className="flex justify-between text-sm text-gray-400 mb-2">
-                            <span>Progress</span>
-                            <span>{settlement.completed}/{settlement.recipients} completed</span>
-                          </div>
-                          <div className="w-full bg-white/10 rounded-full h-2">
-                            <div 
-                              className="h-2 rounded-full transition-all" 
-                              style={{ 
-                                backgroundColor: '#060011',
-                                width: `${(settlement.completed / settlement.recipients) * 100}%` 
-                              }}
-                            />
-                          </div>
-                        </div>
-
-                        <div className="flex gap-3">
-                          <Button size="sm" variant="outline">
-                            View Details
-                          </Button>
-                          {settlement.status === 'active' && (
-                            <Button size="sm" variant="secondary">
-                              Execute Payments
-                            </Button>
-                          )}
-                        </div>
+                    return allSettlementIds.length === 0 ? (
+                      <div className="text-center py-12">
+                        <p className="text-gray-400 mb-4">No settlements found</p>
+                        <Button onClick={() => setActiveTab('create')} variant="outline">
+                          Create Your First Settlement
+                        </Button>
                       </div>
-                    ))}
-                  </div>
+                    ) : (
+                      <div className="space-y-6">
+                        {allSettlementIds.map((settlementId) => (
+                          <SettlementItem key={settlementId.toString()} settlementId={settlementId} />
+                        ))}
+                      </div>
+                    );
+                  })()
                 )}
               </Card>
             </motion.div>

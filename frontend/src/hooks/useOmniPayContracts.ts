@@ -327,6 +327,173 @@ export const formatSubscriptionInterval = (intervalInSeconds: bigint) => {
   return `Every ${days} days`;
 };
 
+// Hook for creating settlements
+export const useCreateSettlement = () => {
+  const { writeContract, data: hash, isPending, error } = useWriteContract();
+  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
+    hash,
+  });
+
+  const createSettlement = async (
+    payee: `0x${string}`,
+    token: `0x${string}`,
+    amount: string,
+    paymentRef: string
+  ) => {
+    try {
+      await writeContract({
+        address: OMNIPAY_CONTRACTS.SETTLEMENT,
+        abi: CONTRACT_ABIS.SETTLEMENT,
+        functionName: 'createSettlement',
+        args: [payee, token, parseEther(amount), paymentRef],
+      });
+    } catch (err) {
+      console.error('Settlement creation failed:', err);
+      throw err;
+    }
+  };
+
+  return {
+    createSettlement,
+    hash,
+    isPending,
+    isConfirming,
+    isSuccess,
+    error,
+  };
+};
+
+// Hook for executing settlements
+export const useExecuteSettlement = () => {
+  const { writeContract, data: hash, isPending, error } = useWriteContract();
+  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
+    hash,
+  });
+
+  const executeSettlement = async (settlementId: bigint, isETH: boolean = false, ethAmount?: string) => {
+    try {
+      if (isETH && ethAmount) {
+        // Use executeETHSettlement for ETH payments
+        await writeContract({
+          address: OMNIPAY_CONTRACTS.SETTLEMENT,
+          abi: CONTRACT_ABIS.SETTLEMENT,
+          functionName: 'executeETHSettlement',
+          args: [settlementId],
+          value: parseEther(ethAmount),
+        });
+      } else {
+        // Use executeSettlement for ERC20 payments
+        await writeContract({
+          address: OMNIPAY_CONTRACTS.SETTLEMENT,
+          abi: CONTRACT_ABIS.SETTLEMENT,
+          functionName: 'executeSettlement',
+          args: [settlementId],
+        });
+      }
+    } catch (err) {
+      console.error('Settlement execution failed:', err);
+      throw err;
+    }
+  };
+
+  return {
+    executeSettlement,
+    hash,
+    isPending,
+    isConfirming,
+    isSuccess,
+    error,
+  };
+};
+
+// Hook for canceling settlements
+export const useCancelSettlement = () => {
+  const { writeContract, data: hash, isPending, error } = useWriteContract();
+  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
+    hash,
+  });
+
+  const cancelSettlement = async (settlementId: bigint) => {
+    try {
+      await writeContract({
+        address: OMNIPAY_CONTRACTS.SETTLEMENT,
+        abi: CONTRACT_ABIS.SETTLEMENT,
+        functionName: 'cancelSettlement',
+        args: [settlementId],
+      });
+    } catch (err) {
+      console.error('Settlement cancellation failed:', err);
+      throw err;
+    }
+  };
+
+  return {
+    cancelSettlement,
+    hash,
+    isPending,
+    isConfirming,
+    isSuccess,
+    error,
+  };
+};
+
+// Hook for reading user's settlements as payer
+export const usePayerSettlements = (payerAddress?: `0x${string}`) => {
+  const { data, isLoading, error } = useReadContract({
+    address: OMNIPAY_CONTRACTS.SETTLEMENT,
+    abi: CONTRACT_ABIS.SETTLEMENT,
+    functionName: 'getPayerSettlements',
+    args: payerAddress ? [payerAddress] : undefined,
+    query: {
+      enabled: !!payerAddress,
+    },
+  });
+
+  return {
+    settlementIds: data,
+    isLoading,
+    error,
+  };
+};
+
+// Hook for reading user's settlements as payee
+export const usePayeeSettlements = (payeeAddress?: `0x${string}`) => {
+  const { data, isLoading, error } = useReadContract({
+    address: OMNIPAY_CONTRACTS.SETTLEMENT,
+    abi: CONTRACT_ABIS.SETTLEMENT,
+    functionName: 'getPayeeSettlements',
+    args: payeeAddress ? [payeeAddress] : undefined,
+    query: {
+      enabled: !!payeeAddress,
+    },
+  });
+
+  return {
+    settlementIds: data,
+    isLoading,
+    error,
+  };
+};
+
+// Hook for reading settlement details
+export const useSettlementDetails = (settlementId?: bigint) => {
+  const { data, isLoading, error } = useReadContract({
+    address: OMNIPAY_CONTRACTS.SETTLEMENT,
+    abi: CONTRACT_ABIS.SETTLEMENT,
+    functionName: 'getSettlement',
+    args: settlementId ? [settlementId] : undefined,
+    query: {
+      enabled: !!settlementId,
+    },
+  });
+
+  return {
+    settlement: data,
+    isLoading,
+    error,
+  };
+};
+
 // Utility function to get next payment date
 export const getNextPaymentDate = (lastPayment: bigint, interval: bigint) => {
   const lastPaymentMs = Number(lastPayment) * 1000;
