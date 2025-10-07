@@ -49,6 +49,13 @@ const AVAILABLE_TOKENS = [
     icon: 'dai' as keyof typeof TOKEN_ICONS,
     decimals: 18,
   },
+  {
+    symbol: 'PUSH',
+    name: 'Push Protocol',
+    address: '0xf418588522d5dd018b425E472991E52EBBeEEEEE', // Push token contract address
+    icon: 'push' as keyof typeof TOKEN_ICONS,
+    decimals: 18,
+  },
 ] as const;
 
 const SettlementPage = (): FunctionComponent => {
@@ -388,7 +395,7 @@ const SettlementPage = (): FunctionComponent => {
                               const selectedToken = AVAILABLE_TOKENS.find(token => token.address === settlementData.token);
                               return selectedToken ? (
                                 <>
-                                  <TokenIcon token={selectedToken.icon} size="sm" />
+                                  <TokenIcon token={selectedToken.icon} size={16} />
                                   <span>{selectedToken.symbol}</span>
                                 </>
                               ) : (
@@ -410,7 +417,7 @@ const SettlementPage = (): FunctionComponent => {
                                  }}
                                 className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-white/10 transition-colors first:rounded-t-xl last:rounded-b-xl"
                               >
-                                <TokenIcon token={token.icon} size="sm" />
+                                <TokenIcon token={token.icon} size={16} />
                                 <div>
                                   <div className="text-white font-medium">{token.symbol}</div>
                                   <div className="text-gray-400 text-sm">{token.name}</div>
