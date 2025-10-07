@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SubscriptionsRouteImport } from './routes/subscriptions'
 import { Route as SettlementRouteImport } from './routes/settlement'
 import { Route as PaymentsRouteImport } from './routes/payments'
+import { Route as FaucetRouteImport } from './routes/faucet'
 import { Route as BridgeRouteImport } from './routes/bridge'
 import { Route as IndexRouteImport } from './routes/index'
 
@@ -30,6 +31,11 @@ const PaymentsRoute = PaymentsRouteImport.update({
   path: '/payments',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FaucetRoute = FaucetRouteImport.update({
+  id: '/faucet',
+  path: '/faucet',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BridgeRoute = BridgeRouteImport.update({
   id: '/bridge',
   path: '/bridge',
@@ -44,6 +50,7 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/bridge': typeof BridgeRoute
+  '/faucet': typeof FaucetRoute
   '/payments': typeof PaymentsRoute
   '/settlement': typeof SettlementRoute
   '/subscriptions': typeof SubscriptionsRoute
@@ -51,6 +58,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/bridge': typeof BridgeRoute
+  '/faucet': typeof FaucetRoute
   '/payments': typeof PaymentsRoute
   '/settlement': typeof SettlementRoute
   '/subscriptions': typeof SubscriptionsRoute
@@ -59,19 +67,33 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/bridge': typeof BridgeRoute
+  '/faucet': typeof FaucetRoute
   '/payments': typeof PaymentsRoute
   '/settlement': typeof SettlementRoute
   '/subscriptions': typeof SubscriptionsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/bridge' | '/payments' | '/settlement' | '/subscriptions'
+  fullPaths:
+    | '/'
+    | '/bridge'
+    | '/faucet'
+    | '/payments'
+    | '/settlement'
+    | '/subscriptions'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/bridge' | '/payments' | '/settlement' | '/subscriptions'
+  to:
+    | '/'
+    | '/bridge'
+    | '/faucet'
+    | '/payments'
+    | '/settlement'
+    | '/subscriptions'
   id:
     | '__root__'
     | '/'
     | '/bridge'
+    | '/faucet'
     | '/payments'
     | '/settlement'
     | '/subscriptions'
@@ -80,6 +102,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   BridgeRoute: typeof BridgeRoute
+  FaucetRoute: typeof FaucetRoute
   PaymentsRoute: typeof PaymentsRoute
   SettlementRoute: typeof SettlementRoute
   SubscriptionsRoute: typeof SubscriptionsRoute
@@ -108,6 +131,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PaymentsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/faucet': {
+      id: '/faucet'
+      path: '/faucet'
+      fullPath: '/faucet'
+      preLoaderRoute: typeof FaucetRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/bridge': {
       id: '/bridge'
       path: '/bridge'
@@ -128,6 +158,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   BridgeRoute: BridgeRoute,
+  FaucetRoute: FaucetRoute,
   PaymentsRoute: PaymentsRoute,
   SettlementRoute: SettlementRoute,
   SubscriptionsRoute: SubscriptionsRoute,

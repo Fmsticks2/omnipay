@@ -63,6 +63,13 @@ const Header = (): FunctionComponent => {
               <span>Bridge</span>
             </Link>
             <Link
+              to="/faucet"
+              className="flex items-center space-x-2 text-white/80 hover:text-white transition-colors duration-200 font-medium"
+            >
+              <Icon icon="mdi:water" size={18} />
+              <span>Faucet</span>
+            </Link>
+            <Link
               to="/settlement"
               className="flex items-center space-x-2 text-white/80 hover:text-white transition-colors duration-200 font-medium"
             >
