@@ -53,6 +53,7 @@ export const UI_ICONS = {
   subscriptions: 'mdi:calendar-sync',
   settlement: 'mdi:gavel',
   settings: 'mdi:cog',
+  logo: 'mdi:wallet',
   
   // Actions
   send: 'mdi:send',

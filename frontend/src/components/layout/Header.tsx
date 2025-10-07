@@ -1,92 +1,79 @@
-import { motion } from 'framer-motion';
-import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { Link } from '@tanstack/react-router';
-import type { FunctionComponent } from '../../common/types';
-import Icon from '../ui/Icon';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
+import { useAccount } from 'wagmi';
+import Icon, { ChainIcon } from '../ui/Icon';
 import { UI_ICONS } from '../ui/iconConstants';
+import { getChainMetadata } from '../../config/chains';
 
-const Header = (): FunctionComponent => {
+export default function Header() {
+  const { chain } = useAccount();
+  const chainMetadata = chain ? getChainMetadata(chain.id) : null;
+
   return (
-    <div className="sticky top-0 z-50 flex justify-center px-6 py-4">
-      <motion.header
-        initial={{ y: -100, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
-        className="backdrop-blur-md border border-white/10 rounded-2xl max-w-7xl w-full"
-        style={{ backgroundColor: '#060011' }}
-      >
-        <div className="px-8 py-4">
+    <header className="bg-black/20 backdrop-blur-md border-b border-white/10 sticky top-0 z-50">
+      <div className="container mx-auto px-4 py-3">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <motion.div
-            whileHover={{ scale: 1.05 }}
-            className="flex items-center space-x-3"
-          >
-            <Link to="/" className="flex items-center space-x-3">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: '#060011', border: '1px solid rgba(255,255,255,0.2)' }}>
-                <Icon icon="mdi:wallet" size={24} color="white" />
-              </div>
-              <span className="text-2xl font-bold text-white">
-                OmniPay
-              </span>
-            </Link>
-          </motion.div>
+          <Link to="/" className="flex items-center space-x-2">
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center" 
+                 style={{ backgroundColor: '#060011', border: '1px solid rgba(255, 255, 255, 0.2)' }}>
+              <Icon icon={UI_ICONS.logo} size={18} color="#00D4FF" />
+            </div>
+            <span className="text-lg font-bold text-white">OmniPay</span>
+          </Link>
 
           {/* Navigation */}
-          <nav className="hidden md:flex items-center space-x-6 flex-1 justify-center max-w-2xl">
-            <Link
-              to="/"
-              className="flex items-center space-x-2 text-white/80 hover:text-white transition-colors duration-200 font-medium"
+          <nav className="hidden md:flex items-center space-x-6">
+            <Link 
+              to="/subscriptions" 
+              className="flex items-center space-x-1.5 text-gray-300 hover:text-white transition-colors text-sm"
             >
-              <Icon icon={UI_ICONS.home} size={18} />
-              <span>Home</span>
-            </Link>
-            <Link
-              to="/payments"
-              className="flex items-center space-x-2 text-white/80 hover:text-white transition-colors duration-200 font-medium"
-            >
-              <Icon icon={UI_ICONS.payments} size={18} />
-              <span>Payments</span>
-            </Link>
-            <Link
-              to="/subscriptions"
-              className="flex items-center space-x-2 text-white/80 hover:text-white transition-colors duration-200 font-medium"
-            >
-              <Icon icon={UI_ICONS.subscriptions} size={18} />
+              <Icon icon={UI_ICONS.subscription} size={16} />
               <span>Subscriptions</span>
             </Link>
-            <Link
-              to="/bridge"
-              className="flex items-center space-x-2 text-white/80 hover:text-white transition-colors duration-200 font-medium"
+            <Link 
+              to="/bridge" 
+              className="flex items-center space-x-1.5 text-gray-300 hover:text-white transition-colors text-sm"
             >
-              <Icon icon={UI_ICONS.crossChain} size={18} />
+              <Icon icon={UI_ICONS.bridge} size={16} />
               <span>Bridge</span>
             </Link>
-            <Link
-              to="/faucet"
-              className="flex items-center space-x-2 text-white/80 hover:text-white transition-colors duration-200 font-medium"
+            <Link 
+              to="/faucet" 
+              className="flex items-center space-x-1.5 text-gray-300 hover:text-white transition-colors text-sm"
             >
-              <Icon icon="mdi:water" size={18} />
+              <Icon icon="mdi:water-pump" size={16} />
               <span>Faucet</span>
             </Link>
-            <Link
-              to="/settlement"
-              className="flex items-center space-x-2 text-white/80 hover:text-white transition-colors duration-200 font-medium"
+            <Link 
+              to="/settlement" 
+              className="flex items-center space-x-1.5 text-gray-300 hover:text-white transition-colors text-sm"
             >
-              <Icon icon={UI_ICONS.settlement} size={18} />
+              <Icon icon={UI_ICONS.settlement} size={16} />
               <span>Settlement</span>
             </Link>
           </nav>
 
-          {/* Wallet Connection */}
-          <div className="flex items-center space-x-4 min-w-0 flex-shrink-0">
+          {/* Network Display & Connect Button */}
+          <div className="flex items-center space-x-3">
+            {/* Network Display */}
+            {chain && chainMetadata && (
+              <div className="hidden sm:flex items-center space-x-2 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10">
+                <ChainIcon 
+                  chain={chain.id === 42101 ? 'push' : 'ethereum'} 
+                  size={16} 
+                />
+                <span className="text-xs text-gray-300">
+                  {chain.testnet ? 'Testnet' : chainMetadata.shortName}
+                </span>
+              </div>
+            )}
+            
+            {/* Connect Button */}
             <ConnectButton />
           </div>
         </div>
-        </div>
-      </motion.header>
-    </div>
+      </div>
+    </header>
   );
-};
-
-export default Header;
+}
