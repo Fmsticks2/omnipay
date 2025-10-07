@@ -125,4 +125,10 @@ export const UI_ICONS = {
   oneTime: 'mdi:numeric-1-circle',
   dispute: 'mdi:gavel',
   escrow: 'mdi:shield-lock',
+  
+  // Footer pages
+  community: 'mdi:account-group',
+  privacy: 'mdi:shield-account',
+  support: 'mdi:help-circle',
+  api: 'mdi:api',
 } as const;

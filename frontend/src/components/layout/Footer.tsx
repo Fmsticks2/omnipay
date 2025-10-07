@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { Link } from '@tanstack/react-router';
 import type { FunctionComponent } from '../../common/types';
 import Icon from '../ui/Icon';
 
@@ -57,28 +58,28 @@ const Footer = (): FunctionComponent => {
             <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
             <ul className="space-y-2">
               <li>
-                <a href="#" className="text-gray-300 hover:text-white transition-colors flex items-center space-x-2">
+                <Link to="/documentation" className="text-gray-300 hover:text-white transition-colors flex items-center space-x-2">
                   <Icon icon="mdi:book-open" size={16} />
                   <span>Documentation</span>
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="text-gray-300 hover:text-white transition-colors flex items-center space-x-2">
+                <Link to="/api-reference" className="text-gray-300 hover:text-white transition-colors flex items-center space-x-2">
                   <Icon icon="mdi:api" size={16} />
                   <span>API Reference</span>
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="text-gray-300 hover:text-white transition-colors flex items-center space-x-2">
+                <Link to="/support" className="text-gray-300 hover:text-white transition-colors flex items-center space-x-2">
                   <Icon icon="mdi:help-circle" size={16} />
                   <span>Support</span>
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="text-gray-300 hover:text-white transition-colors flex items-center space-x-2">
+                <Link to="/community" className="text-gray-300 hover:text-white transition-colors flex items-center space-x-2">
                   <Icon icon="mdi:account-group" size={16} />
                   <span>Community</span>
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
@@ -88,22 +89,22 @@ const Footer = (): FunctionComponent => {
             <h3 className="text-lg font-semibold mb-4">Legal</h3>
             <ul className="space-y-2">
               <li>
-                <a href="#" className="text-gray-300 hover:text-white transition-colors flex items-center space-x-2">
+                <Link to="/privacy-policy" className="text-gray-300 hover:text-white transition-colors flex items-center space-x-2">
                   <Icon icon="mdi:shield-account" size={16} />
                   <span>Privacy Policy</span>
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="text-gray-300 hover:text-white transition-colors flex items-center space-x-2">
+                <Link to="/terms-of-service" className="text-gray-300 hover:text-white transition-colors flex items-center space-x-2">
                   <Icon icon="mdi:file-document" size={16} />
                   <span>Terms of Service</span>
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="text-gray-300 hover:text-white transition-colors flex items-center space-x-2">
+                <Link to="/cookie-policy" className="text-gray-300 hover:text-white transition-colors flex items-center space-x-2">
                   <Icon icon="mdi:cookie" size={16} />
                   <span>Cookie Policy</span>
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
