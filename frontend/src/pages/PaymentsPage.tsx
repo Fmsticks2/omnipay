@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAccount, useBalance } from 'wagmi';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import Button from '../components/ui/Button';
@@ -46,7 +46,7 @@ export default function PaymentsPage() {
   const { address, isConnected, chain } = useAccount();
   const { data: balance } = useBalance({ address });
   const { sendPayment, isSuccess, error, isPending, isConfirming } = useSendPayment();
-  const { paymentHistory, isLoading: isLoadingHistory } = usePaymentHistory(address);
+  const { paymentHistory, isLoading: isLoadingHistory, refetch: refetchPaymentHistory } = usePaymentHistory(address);
 
   const [formData, setFormData] = useState({
     recipient: '',
@@ -57,6 +57,25 @@ export default function PaymentsPage() {
 
   const [showTokenSelector, setShowTokenSelector] = useState(false);
   const [activeTab, setActiveTab] = useState<'send' | 'history'>('send');
+
+  // Refetch payment history when payment is successful
+  useEffect(() => {
+    if (isSuccess) {
+      // Reset form
+      setFormData({
+        recipient: '',
+        amount: '',
+        token: 'native',
+        reference: '',
+      });
+      
+      // Refetch payment history to show the new transaction
+      refetchPaymentHistory();
+      
+      // Switch to history tab to show the updated list
+      setActiveTab('history');
+    }
+  }, [isSuccess, refetchPaymentHistory]);
 
   const selectedToken = AVAILABLE_TOKENS.find(token => 
     token.address === formData.token || (formData.token === 'native' && token.address === 'native')

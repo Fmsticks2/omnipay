@@ -89,20 +89,38 @@ export const useCreateSubscription = () => {
 
 // Hook for reading payment history
 export const usePaymentHistory = (userAddress?: `0x${string}`) => {
-  const { data, isLoading, error } = useReadContract({
+  // First get the total transaction count
+  const { data: transactionCount } = useReadContract({
     address: OMNIPAY_CONTRACTS.CORE,
     abi: CONTRACT_ABIS.CORE,
-    functionName: 'getPaymentHistory',
-    args: userAddress ? [userAddress] : undefined,
+    functionName: 'transactionCount',
     query: {
       enabled: !!userAddress,
     },
   });
 
+  // Then get all transactions and filter by user
+  const { data: allTransactions, isLoading, error, refetch } = useReadContract({
+    address: OMNIPAY_CONTRACTS.CORE,
+    abi: CONTRACT_ABIS.CORE,
+    functionName: 'getTransactions',
+    args: transactionCount ? [0n, transactionCount] : undefined,
+    query: {
+      enabled: !!userAddress && !!transactionCount,
+    },
+  });
+
+  // Filter transactions for the specific user (as payer or payee)
+  const paymentHistory = (allTransactions as any[])?.filter((tx: any) => 
+    tx.payer?.toLowerCase() === userAddress?.toLowerCase() || 
+    tx.payee?.toLowerCase() === userAddress?.toLowerCase()
+  ) || [];
+
   return {
-    paymentHistory: data,
+    paymentHistory,
     isLoading,
     error,
+    refetch,
   };
 };
 
