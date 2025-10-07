@@ -4,6 +4,7 @@ import contractsData from './contracts.json';
 // Import ABIs
 import OmniPayCoreABI from './abis/OmniPayCore.json';
 import OmniPayBridgeABI from './abis/OmniPayBridge.json';
+import OmniPayBridgeStubABI from './abis/OmniPayBridgeStub.json';
 import OmniPaySettlementABI from './abis/OmniPaySettlement.json';
 import OmniPaySubscriptionABI from './abis/OmniPaySubscription.json';
 import OmniPayNotifierABI from './abis/OmniPayNotifier.json';
@@ -21,6 +22,7 @@ export const OMNIPAY_CONTRACTS = {
 export const CONTRACT_ABIS = {
   CORE: OmniPayCoreABI.abi,
   BRIDGE: OmniPayBridgeABI.abi,
+  BRIDGE_STUB: OmniPayBridgeStubABI.abi,
   SETTLEMENT: OmniPaySettlementABI.abi,
   SUBSCRIPTION: OmniPaySubscriptionABI.abi,
   NOTIFIER: OmniPayNotifierABI.abi,

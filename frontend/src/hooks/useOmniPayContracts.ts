@@ -187,6 +187,123 @@ export const useExecuteSubscription = () => {
   };
 };
 
+// Hook for initiating cross-chain payments via main Bridge
+export const useInitiateCrossChainPayment = () => {
+  const { writeContract, data: hash, isPending, error } = useWriteContract();
+  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
+    hash,
+  });
+
+  const initiateCrossChainPayment = async (
+    payer: `0x${string}`,
+    payee: `0x${string}`,
+    token: `0x${string}`,
+    amount: string,
+    targetChainId: number,
+    paymentRef: string,
+    value?: string
+  ) => {
+    try {
+      await writeContract({
+        address: OMNIPAY_CONTRACTS.BRIDGE,
+        abi: CONTRACT_ABIS.BRIDGE,
+        functionName: 'initiateCrossChainPayment',
+        args: [payer, payee, token, parseEther(amount), BigInt(targetChainId), paymentRef],
+        value: value ? parseEther(value) : undefined,
+      });
+    } catch (err) {
+      console.error('Cross-chain payment initiation failed:', err);
+      throw err;
+    }
+  };
+
+  return {
+    initiateCrossChainPayment,
+    hash,
+    isPending,
+    isConfirming,
+    isSuccess,
+    error,
+  };
+};
+
+// Hook for completing cross-chain payments via main Bridge
+export const useCompleteCrossChainPayment = () => {
+  const { writeContract, data: hash, isPending, error } = useWriteContract();
+  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
+    hash,
+  });
+
+  const completeCrossChainPayment = async (
+    paymentId: bigint,
+    payer: `0x${string}`,
+    payee: `0x${string}`,
+    token: `0x${string}`,
+    amount: string,
+    sourceChainId: number,
+    paymentRef: string
+  ) => {
+    try {
+      await writeContract({
+        address: OMNIPAY_CONTRACTS.BRIDGE,
+        abi: CONTRACT_ABIS.BRIDGE,
+        functionName: 'completeCrossChainPayment',
+        args: [paymentId, payer, payee, token, parseEther(amount), BigInt(sourceChainId), paymentRef],
+      });
+    } catch (err) {
+      console.error('Cross-chain payment completion failed:', err);
+      throw err;
+    }
+  };
+
+  return {
+    completeCrossChainPayment,
+    hash,
+    isPending,
+    isConfirming,
+    isSuccess,
+    error,
+  };
+};
+
+// Hook for reading cross-chain payment details
+export const usePaymentDetails = (paymentId?: bigint) => {
+  const { data, isLoading, error } = useReadContract({
+    address: OMNIPAY_CONTRACTS.BRIDGE,
+    abi: CONTRACT_ABIS.BRIDGE,
+    functionName: 'getPayment',
+    args: paymentId ? [paymentId] : undefined,
+    query: {
+      enabled: !!paymentId,
+    },
+  });
+
+  return {
+    payment: data,
+    isLoading,
+    error,
+  };
+};
+
+// Hook for reading payer's payment history
+export const usePayerPayments = (payer?: `0x${string}`) => {
+  const { data, isLoading, error } = useReadContract({
+    address: OMNIPAY_CONTRACTS.BRIDGE,
+    abi: CONTRACT_ABIS.BRIDGE,
+    functionName: 'getPayerPayments',
+    args: payer ? [payer] : undefined,
+    query: {
+      enabled: !!payer,
+    },
+  });
+
+  return {
+    paymentIds: data,
+    isLoading,
+    error,
+  };
+};
+
 // Utility functions for formatting
 export const formatPaymentAmount = (amount: bigint) => {
   return formatEther(amount);
