@@ -44,25 +44,67 @@ const AVAILABLE_TOKENS = [
 
 // Helper function to get token info from address
 const getTokenInfo = (tokenAddress: string) => {
-  // Handle native ETH (zero address)
+  // Handle native PC token (zero address on Push Chain)
   if (tokenAddress === '0x0000000000000000000000000000000000000000' || tokenAddress === 'native') {
     return {
-      symbol: 'ETH',
-      name: 'Ethereum',
-      icon: 'eth' as keyof typeof TOKEN_ICONS,
+      symbol: 'PC',
+      name: 'Push Chain Token',
+      icon: 'push' as keyof typeof TOKEN_ICONS,
       decimals: 18,
     };
   }
   
-  // Find token by address
+  // Find token by address in AVAILABLE_TOKENS
   const token = AVAILABLE_TOKENS.find(t => 
     t.address.toLowerCase() === tokenAddress.toLowerCase()
   );
   
-  return token || {
+  if (token) {
+    return token;
+  }
+  
+  // Check SUPPORTED_TOKENS for additional token addresses
+  const supportedTokenEntry = Object.entries(SUPPORTED_TOKENS).find(([_, address]) => 
+    address.toLowerCase() === tokenAddress.toLowerCase()
+  );
+  
+  if (supportedTokenEntry) {
+    const [tokenSymbol] = supportedTokenEntry;
+    // Map known supported tokens
+    const tokenMap: Record<string, any> = {
+      'USDC': {
+        symbol: 'USDC',
+        name: 'USD Coin',
+        icon: 'usdc' as keyof typeof TOKEN_ICONS,
+        decimals: 6,
+      },
+      'USDT': {
+        symbol: 'USDT', 
+        name: 'Tether USD',
+        icon: 'usdt' as keyof typeof TOKEN_ICONS,
+        decimals: 6,
+      },
+      'DAI': {
+        symbol: 'DAI',
+        name: 'Dai Stablecoin', 
+        icon: 'dai' as keyof typeof TOKEN_ICONS,
+        decimals: 18,
+      }
+    };
+    
+    return tokenMap[tokenSymbol] || {
+      symbol: tokenSymbol,
+      name: `${tokenSymbol} Token`,
+      icon: 'push' as keyof typeof TOKEN_ICONS,
+      decimals: 18,
+    };
+  }
+  
+  // Fallback for unknown tokens
+  return {
     symbol: 'UNKNOWN',
     name: 'Unknown Token',
-    icon: 'eth' as keyof typeof TOKEN_ICONS,
+    icon: 'push' as keyof typeof TOKEN_ICONS,
     decimals: 18,
   };
 };
