@@ -7,7 +7,7 @@ import Button from '../components/ui/Button';
 export function CookiePolicyPage() {
   return (
     <Layout>
-      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 py-20">
+      <div className="min-h-screen p-6">
         <div className="max-w-4xl mx-auto px-6">
           {/* Header */}
           <motion.div
