@@ -407,17 +407,17 @@ export default function PaymentsPage() {
                           </div>
                           <div>
                             <p className="text-white font-semibold">
-                              {formatPaymentAmount(payment.amount)} {payment.token || 'PUSH'}
+                              {formatPaymentAmount(BigInt(payment.amount))} {payment.token || 'PUSH'}
                             </p>
                             <p className="text-gray-400 text-sm">
-                              To: {payment.recipient ? `${payment.recipient.slice(0, 6)}...${payment.recipient.slice(-4)}` : 'Unknown'}
+                              To: {payment.payee ? `${payment.payee.slice(0, 6)}...${payment.payee.slice(-4)}` : 'Unknown'}
                             </p>
                           </div>
                         </div>
                         <div className="text-right">
                           <p className="text-green-400 text-sm font-semibold">Completed</p>
                           <p className="text-gray-400 text-xs">
-                            {payment.timestamp ? new Date(payment.timestamp * 1000).toLocaleDateString() : 'Recent'}
+                            {payment.timestamp ? new Date(Number(payment.timestamp) * 1000).toLocaleDateString() : 'Recent'}
                           </p>
                         </div>
                       </div>
