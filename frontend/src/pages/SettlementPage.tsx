@@ -6,6 +6,8 @@ import type { FunctionComponent } from '../common/types';
 import Layout from '../components/layout/Layout';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
+import Icon, { TokenIcon } from '../components/ui/Icon';
+import { TOKEN_ICONS } from '../components/ui/iconConstants';
 import { 
   useCreateSettlement, 
   useExecuteSettlement, 
@@ -14,7 +16,40 @@ import {
   usePayeeSettlements,
   useSettlementDetails
 } from '../hooks/useOmniPayContracts';
+import { SUPPORTED_TOKENS } from '../config/contracts';
 import { formatEther } from 'viem';
+
+// Token configuration with proper addresses and metadata
+const AVAILABLE_TOKENS = [
+  {
+    symbol: 'ETH',
+    name: 'Ethereum',
+    address: '0x0000000000000000000000000000000000000000',
+    icon: 'eth' as keyof typeof TOKEN_ICONS,
+    decimals: 18,
+  },
+  {
+    symbol: 'USDC',
+    name: 'USD Coin',
+    address: SUPPORTED_TOKENS.USDC,
+    icon: 'usdc' as keyof typeof TOKEN_ICONS,
+    decimals: 6,
+  },
+  {
+    symbol: 'USDT',
+    name: 'Tether USD',
+    address: SUPPORTED_TOKENS.USDT,
+    icon: 'usdt' as keyof typeof TOKEN_ICONS,
+    decimals: 6,
+  },
+  {
+    symbol: 'DAI',
+    name: 'Dai Stablecoin',
+    address: SUPPORTED_TOKENS.DAI,
+    icon: 'dai' as keyof typeof TOKEN_ICONS,
+    decimals: 18,
+  },
+] as const;
 
 const SettlementPage = (): FunctionComponent => {
   const { address, isConnected } = useAccount();
@@ -26,9 +61,10 @@ const SettlementPage = (): FunctionComponent => {
     title: '',
     description: '',
     deadline: '',
-    token: 'ETH' as 'ETH' | 'ERC20',
+    token: AVAILABLE_TOKENS[0].address as `0x${string}`, // Default to ETH
     tokenAddress: ''
   });
+  const [showTokenSelector, setShowTokenSelector] = useState(false);
 
   // Smart contract hooks
   const { createSettlement, isPending: isCreating, isSuccess: isCreateSuccess, error: createError } = useCreateSettlement();
@@ -48,7 +84,7 @@ const SettlementPage = (): FunctionComponent => {
         title: '',
         description: '',
         deadline: '',
-        token: 'ETH',
+        token: AVAILABLE_TOKENS[0].address as `0x${string}`,
         tokenAddress: ''
       });
       setRecipients([{ address: '', amount: '', token: 'ETH' }]);
@@ -124,8 +160,9 @@ const SettlementPage = (): FunctionComponent => {
       return;
     }
 
-    if (settlementData.token === 'ERC20' && !settlementData.tokenAddress) {
-      toast.error('Please enter the token address for ERC20 payments');
+    const selectedToken = AVAILABLE_TOKENS.find(token => token.address === settlementData.token);
+    if (!selectedToken) {
+      toast.error('Please select a valid token');
       return;
     }
 
@@ -135,14 +172,14 @@ const SettlementPage = (): FunctionComponent => {
       for (const recipient of recipients) {
         if (!recipient.address || !recipient.amount) continue;
         
-        const tokenAddress = settlementData.token === 'ETH' 
+        const tokenAddress = settlementData.token === '0x0000000000000000000000000000000000000000' 
           ? '0x0000000000000000000000000000000000000000' // ETH address
-          : settlementData.tokenAddress as `0x${string}`;
+          : settlementData.token as `0x${string}`;
 
         await createSettlement(
           recipient.address as `0x${string}`,
           tokenAddress,
-          recipient.amount,
+          (parseFloat(recipient.amount) * Math.pow(10, selectedToken.decimals)).toString(),
           `${settlementData.title} - ${settlementData.description || 'Settlement payment'}`
         );
       }
@@ -341,37 +378,47 @@ const SettlementPage = (): FunctionComponent => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                     <div>
                       <label className="block text-sm font-medium text-gray-300 mb-2">Payment Token</label>
-                      <div className="flex gap-2">
+                      <div className="relative">
                         <button
-                          onClick={() => setSettlementData({...settlementData, token: 'ETH'})}
-                          className={`flex-1 py-3 px-4 rounded-xl font-medium transition-all ${
-                            settlementData.token === 'ETH'
-                              ? 'text-white'
-                              : 'text-gray-400'
-                          } transition-colors`}
-                          style={
-                            settlementData.token === 'ETH'
-                              ? { backgroundColor: '#060011', border: '1px solid rgba(255, 255, 255, 0.4)' }
-                              : {}
-                          }
+                          onClick={() => setShowTokenSelector(!showTokenSelector)}
+                          className="w-full flex items-center justify-between px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white hover:border-green-500 transition-colors"
                         >
-                          ETH
+                          <div className="flex items-center gap-3">
+                            {(() => {
+                              const selectedToken = AVAILABLE_TOKENS.find(token => token.address === settlementData.token);
+                              return selectedToken ? (
+                                <>
+                                  <TokenIcon token={selectedToken.icon} size="sm" />
+                                  <span>{selectedToken.symbol}</span>
+                                </>
+                              ) : (
+                                <span>Select Token</span>
+                              );
+                            })()}
+                          </div>
+                          <Icon icon="mdi:chevron-down" className={`w-5 h-5 transition-transform ${showTokenSelector ? 'rotate-180' : ''}`} />
                         </button>
-                        <button
-                          onClick={() => setSettlementData({...settlementData, token: 'ERC20'})}
-                          className={`flex-1 py-3 px-4 rounded-xl font-medium transition-all ${
-                            settlementData.token === 'ERC20'
-                              ? 'text-white'
-                              : 'text-gray-400'
-                          } transition-colors`}
-                          style={
-                            settlementData.token === 'ERC20'
-                              ? { backgroundColor: '#060011', border: '1px solid rgba(255, 255, 255, 0.4)' }
-                              : {}
-                          }
-                        >
-                          ERC20
-                        </button>
+                        
+                        {showTokenSelector && (
+                          <div className="absolute top-full left-0 right-0 mt-1 bg-gray-900 border border-white/20 rounded-xl shadow-xl z-50 max-h-60 overflow-y-auto">
+                            {AVAILABLE_TOKENS.map((token) => (
+                              <button
+                                key={token.address}
+                                onClick={() => {
+                                   setSettlementData({...settlementData, token: token.address as `0x${string}`});
+                                   setShowTokenSelector(false);
+                                 }}
+                                className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-white/10 transition-colors first:rounded-t-xl last:rounded-b-xl"
+                              >
+                                <TokenIcon token={token.icon} size="sm" />
+                                <div>
+                                  <div className="text-white font-medium">{token.symbol}</div>
+                                  <div className="text-gray-400 text-sm">{token.name}</div>
+                                </div>
+                              </button>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     </div>
 
@@ -386,20 +433,6 @@ const SettlementPage = (): FunctionComponent => {
                       />
                     </div>
                   </div>
-
-                  {settlementData.token === 'ERC20' && (
-                    <div className="mb-6">
-                      <label className="block text-sm font-medium text-gray-300 mb-2">Token Address</label>
-                      <input
-                        type="text"
-                        name="tokenAddress"
-                        value={settlementData.tokenAddress}
-                        onChange={handleSettlementChange}
-                        placeholder="0x..."
-                        className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-green-500 transition-colors"
-                      />
-                    </div>
-                  )}
 
                   {/* Recipients */}
                   <div className="mb-6">
