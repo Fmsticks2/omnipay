@@ -42,6 +42,43 @@ const AVAILABLE_TOKENS = [
   },
 ] as const;
 
+// Helper function to get token info from address
+const getTokenInfo = (tokenAddress: string) => {
+  // Handle native ETH (zero address)
+  if (tokenAddress === '0x0000000000000000000000000000000000000000' || tokenAddress === 'native') {
+    return {
+      symbol: 'ETH',
+      name: 'Ethereum',
+      icon: 'eth' as keyof typeof TOKEN_ICONS,
+      decimals: 18,
+    };
+  }
+  
+  // Find token by address
+  const token = AVAILABLE_TOKENS.find(t => 
+    t.address.toLowerCase() === tokenAddress.toLowerCase()
+  );
+  
+  return token || {
+    symbol: 'UNKNOWN',
+    name: 'Unknown Token',
+    icon: 'eth' as keyof typeof TOKEN_ICONS,
+    decimals: 18,
+  };
+};
+
+// Helper function to get transaction status
+const getTransactionStatus = () => {
+  // For now, all fetched transactions are completed
+  // In the future, this could check actual transaction status
+  return {
+    text: 'Completed',
+    color: 'text-green-400',
+    bgColor: 'bg-green-500/20',
+    iconColor: 'text-green-400'
+  };
+};
+
 export default function PaymentsPage() {
   const { address, isConnected, chain } = useAccount();
   const { data: balance } = useBalance({ address });
@@ -398,31 +435,47 @@ export default function PaymentsPage() {
                 </div>
               ) : paymentHistory && Array.isArray(paymentHistory) && paymentHistory.length > 0 ? (
                 <div className="space-y-4">
-                  {paymentHistory.map((payment: any, index: number) => (
-                    <div key={index} className="p-4 bg-white/5 rounded-xl border border-white/10">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-4">
-                          <div className="w-10 h-10 bg-green-500/20 rounded-full flex items-center justify-center">
-                            <Icon icon={UI_ICONS.send} size={20} className="text-green-400" />
+                  {paymentHistory.map((payment: any, index: number) => {
+                    const tokenInfo = getTokenInfo(payment.token);
+                    const status = getTransactionStatus();
+                    const formattedAmount = formatPaymentAmount(BigInt(payment.amount));
+                    
+                    return (
+                      <div key={index} className="p-4 bg-white/5 rounded-xl border border-white/10">
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex items-center space-x-4">
+                              <div className="w-10 h-10 bg-green-500/20 rounded-full flex items-center justify-center">
+                                <TokenIcon token={tokenInfo.icon} size={20} />
+                              </div>
+                            <div>
+                              <p className="text-white font-semibold">
+                                {formattedAmount} {tokenInfo.symbol}
+                              </p>
+                              <p className="text-gray-400 text-sm">
+                                To: {payment.payee ? `${payment.payee.slice(0, 6)}...${payment.payee.slice(-4)}` : 'Unknown'}
+                              </p>
+                            </div>
                           </div>
-                          <div>
-                            <p className="text-white font-semibold">
-                              {formatPaymentAmount(BigInt(payment.amount))} {payment.token || 'PUSH'}
-                            </p>
-                            <p className="text-gray-400 text-sm">
-                              To: {payment.payee ? `${payment.payee.slice(0, 6)}...${payment.payee.slice(-4)}` : 'Unknown'}
-                            </p>
+                          <div className={`px-3 py-1 rounded-full text-xs font-medium ${status.bgColor} ${status.color}`}>
+                            {status.text}
                           </div>
                         </div>
-                        <div className="text-right">
-                          <p className="text-green-400 text-sm font-semibold">Completed</p>
-                          <p className="text-gray-400 text-xs">
-                            {payment.timestamp ? new Date(Number(payment.timestamp) * 1000).toLocaleDateString() : 'Recent'}
-                          </p>
+                        
+                        <div className="space-y-2 text-sm">
+                          <div className="flex justify-between">
+                            <span className="text-gray-400">Token:</span>
+                            <span className="text-white">{tokenInfo.name}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-400">Date:</span>
+                            <span className="text-white">
+                              {payment.timestamp ? new Date(Number(payment.timestamp) * 1000).toLocaleString() : 'Recent'}
+                            </span>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               ) : (
                 <div className="text-center py-12">
