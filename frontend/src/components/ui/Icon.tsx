@@ -17,6 +17,11 @@ export default function Icon({
   color, 
   onClick 
 }: IconProps) {
+  // Return null if icon is not provided
+  if (!icon) {
+    return null;
+  }
+
   // Check if it's an SVG path (starts with / or public path)
   if (icon.startsWith('/') || icon.includes('.svg')) {
     return (
@@ -60,6 +65,11 @@ interface TokenIconProps {
 }
 
 export function TokenIcon({ token, size = 24, className }: TokenIconProps) {
+  // Return null if token is not provided or not found in TOKEN_ICONS
+  if (!token || !TOKEN_ICONS[token]) {
+    return null;
+  }
+
   return (
     <Icon
       icon={TOKEN_ICONS[token]}
@@ -77,6 +87,11 @@ interface ChainIconProps {
 }
 
 export function ChainIcon({ chain, size = 24, className }: ChainIconProps) {
+  // Return null if chain is not provided or not found in CHAIN_ICONS
+  if (!chain || !CHAIN_ICONS[chain]) {
+    return null;
+  }
+
   return (
     <Icon
       icon={CHAIN_ICONS[chain]}

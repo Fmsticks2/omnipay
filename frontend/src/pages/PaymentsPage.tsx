@@ -6,14 +6,47 @@ import Card from '../components/ui/Card';
 import Layout from '../components/layout/Layout';
 import Icon, { TokenIcon, ChainIcon } from '../components/ui/Icon';
 import { UI_ICONS, TOKEN_ICONS, CHAIN_ICONS } from '../components/ui/iconConstants';
-import { useSendPayment } from '../hooks/useOmniPayContracts';
+import { useSendPayment, usePaymentHistory, formatPaymentAmount } from '../hooks/useOmniPayContracts';
 import { SUPPORTED_TOKENS } from '../config/contracts';
 import { getChainMetadata } from '../config/chains';
+
+// Token configuration with proper addresses and metadata
+const AVAILABLE_TOKENS = [
+  {
+    symbol: 'PUSH',
+    name: 'Push Token',
+    address: 'native',
+    icon: 'push' as keyof typeof TOKEN_ICONS,
+    decimals: 18,
+  },
+  {
+    symbol: 'USDC',
+    name: 'USD Coin',
+    address: SUPPORTED_TOKENS.USDC,
+    icon: 'usdc' as keyof typeof TOKEN_ICONS,
+    decimals: 6,
+  },
+  {
+    symbol: 'USDT',
+    name: 'Tether USD',
+    address: SUPPORTED_TOKENS.USDT,
+    icon: 'usdt' as keyof typeof TOKEN_ICONS,
+    decimals: 6,
+  },
+  {
+    symbol: 'DAI',
+    name: 'Dai Stablecoin',
+    address: SUPPORTED_TOKENS.DAI,
+    icon: 'dai' as keyof typeof TOKEN_ICONS,
+    decimals: 18,
+  },
+] as const;
 
 export default function PaymentsPage() {
   const { address, isConnected, chain } = useAccount();
   const { data: balance } = useBalance({ address });
-  const { sendPayment, isSuccess, error } = useSendPayment();
+  const { sendPayment, isSuccess, error, isPending, isConfirming } = useSendPayment();
+  const { paymentHistory, isLoading: isLoadingHistory } = usePaymentHistory(address);
 
   const [formData, setFormData] = useState({
     recipient: '',
@@ -22,6 +55,13 @@ export default function PaymentsPage() {
     reference: '',
   });
 
+  const [showTokenSelector, setShowTokenSelector] = useState(false);
+  const [activeTab, setActiveTab] = useState<'send' | 'history'>('send');
+
+  const selectedToken = AVAILABLE_TOKENS.find(token => 
+    token.address === formData.token || (formData.token === 'native' && token.address === 'native')
+  ) || AVAILABLE_TOKENS[0];
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isConnected || !address) return;
@@ -29,7 +69,7 @@ export default function PaymentsPage() {
     try {
       const tokenAddress = formData.token === 'native' 
         ? '0x0000000000000000000000000000000000000000' as `0x${string}`
-        : SUPPORTED_TOKENS.USDC;
+        : formData.token as `0x${string}`;
 
       await sendPayment(
         formData.recipient as `0x${string}`,
@@ -40,6 +80,11 @@ export default function PaymentsPage() {
     } catch (err) {
       console.error('Payment failed:', err);
     }
+  };
+
+  const handleTokenSelect = (tokenAddress: string) => {
+    setFormData({ ...formData, token: tokenAddress });
+    setShowTokenSelector(false);
   };
 
   const chainMetadata = chain ? getChainMetadata(chain.id) : null;
@@ -64,14 +109,14 @@ export default function PaymentsPage() {
   return (
     <Layout>
       <div className="min-h-screen p-6">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-6xl mx-auto">
           {/* Header */}
           <div className="flex justify-between items-center mb-8">
             <div className="flex items-center space-x-3">
               <Icon icon={UI_ICONS.send} size={32} className="text-white" />
               <div>
-                <h1 className="text-3xl font-bold text-white mb-2">Send Payment</h1>
-                <p className="text-gray-300">Send cross-chain payments instantly</p>
+                <h1 className="text-3xl font-bold text-white mb-2">Payments</h1>
+                <p className="text-gray-300">Send payments and view transaction history</p>
               </div>
             </div>
             <div className="text-right">
@@ -90,7 +135,34 @@ export default function PaymentsPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Tab Navigation */}
+          <div className="flex justify-center mb-8">
+            <div className="bg-white/10 p-1 rounded-xl">
+              <button
+                onClick={() => setActiveTab('send')}
+                className={`px-6 py-2 rounded-lg transition-colors ${
+                  activeTab === 'send'
+                    ? 'bg-white text-black font-semibold'
+                    : 'text-white hover:bg-white/10'
+                }`}
+              >
+                Send Payment
+              </button>
+              <button
+                onClick={() => setActiveTab('history')}
+                className={`px-6 py-2 rounded-lg transition-colors ${
+                  activeTab === 'history'
+                    ? 'bg-white text-black font-semibold'
+                    : 'text-white hover:bg-white/10'
+                }`}
+              >
+                Transaction History
+              </button>
+            </div>
+          </div>
+
+          {activeTab === 'send' && (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Payment Form */}
             <Card className="p-6">
               <div className="flex items-center space-x-2 mb-6">
@@ -135,24 +207,41 @@ export default function PaymentsPage() {
                     <Icon icon="mdi:coin" size={16} />
                     <span>Token</span>
                   </label>
-                  <select
-                    value={formData.token}
-                    onChange={(e) => setFormData({ ...formData, token: e.target.value })}
-                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:border-white/40 transition-colors"
-                  >
-                    <option value="native" style={{ backgroundColor: '#060011' }}>
-                      Native Token
-                    </option>
-                    <option value="usdc" style={{ backgroundColor: '#060011' }}>
-                      USDC
-                    </option>
-                    <option value="usdt" style={{ backgroundColor: '#060011' }}>
-                      USDT
-                    </option>
-                    <option value="dai" style={{ backgroundColor: '#060011' }}>
-                      DAI
-                    </option>
-                  </select>
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={() => setShowTokenSelector(!showTokenSelector)}
+                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:border-white/40 transition-colors flex items-center justify-between"
+                    >
+                      <div className="flex items-center space-x-3">
+                        <TokenIcon token={selectedToken.icon} size={20} />
+                        <div className="text-left">
+                          <div className="font-semibold">{selectedToken.symbol}</div>
+                          <div className="text-sm text-gray-400">{selectedToken.name}</div>
+                        </div>
+                      </div>
+                      <Icon icon="mdi:chevron-down" size={20} />
+                    </button>
+                    
+                    {showTokenSelector && (
+                      <div className="absolute top-full left-0 right-0 mt-1 bg-black/90 border border-white/20 rounded-xl z-10 max-h-60 overflow-y-auto">
+                        {AVAILABLE_TOKENS.map((token) => (
+                          <button
+                            key={token.address}
+                            type="button"
+                            onClick={() => handleTokenSelect(token.address)}
+                            className="w-full px-4 py-3 text-left hover:bg-white/10 transition-colors flex items-center space-x-3 first:rounded-t-xl last:rounded-b-xl"
+                          >
+                            <TokenIcon token={token.icon} size={20} />
+                            <div>
+                              <div className="font-semibold text-white">{token.symbol}</div>
+                              <div className="text-sm text-gray-400">{token.name}</div>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 <div>
@@ -173,10 +262,10 @@ export default function PaymentsPage() {
                   type="submit"
                   size="lg"
                   className="w-full"
-                  disabled={!formData.recipient || !formData.amount}
+                  disabled={!formData.recipient || !formData.amount || isPending || isConfirming}
                 >
                   <Icon icon="mdi:send" size={20} />
-                  Send Payment
+                  {isPending ? 'Preparing...' : isConfirming ? 'Confirming...' : 'Send Payment'}
                 </Button>
               </form>
 
@@ -184,7 +273,7 @@ export default function PaymentsPage() {
                 <div className="mt-4 p-4 bg-red-900/50 border border-red-500 rounded-xl flex items-start space-x-2">
                   <Icon icon={UI_ICONS.error} size={20} className="text-red-400 mt-0.5" />
                   <p className="text-red-300 text-sm">
-                    Error: {error.message}
+                    Error: {error?.message || 'An unknown error occurred'}
                   </p>
                 </div>
               )}
@@ -233,14 +322,9 @@ export default function PaymentsPage() {
                     <span>Amount</span>
                   </span>
                   <div className="flex items-center space-x-2">
-                    {formData.token !== 'native' && (
-                      <TokenIcon 
-                        token={formData.token as keyof typeof TOKEN_ICONS} 
-                        size={20} 
-                      />
-                    )}
+                    <TokenIcon token={selectedToken.icon} size={20} />
                     <span className="text-white font-semibold">
-                      {formData.amount || '0'} {formData.token === 'native' ? balance?.symbol : formData.token.toUpperCase()}
+                      {formData.amount || '0'} {selectedToken.symbol}
                     </span>
                   </div>
                 </div>
@@ -272,30 +356,6 @@ export default function PaymentsPage() {
                 </div>
               </div>
 
-              {/* Quick Actions */}
-              <div className="mt-6 pt-6 border-t border-white/10">
-                <h3 className="text-lg font-semibold text-white mb-4 flex items-center space-x-2">
-                  <Icon icon="mdi:lightning-bolt" size={20} className="text-white" />
-                  <span>Quick Actions</span>
-                </h3>
-                <div className="grid grid-cols-2 gap-3">
-                  <Button
-                    variant="outline"
-                    className="flex items-center justify-center space-x-2 py-2 px-4 border border-white/20 rounded-xl hover:bg-white/10 transition-colors"
-                  >
-                    <Icon icon="mdi:history" size={16} />
-                    <span>History</span>
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="flex items-center justify-center space-x-2 py-2 px-4 border border-white/20 rounded-xl hover:bg-white/10 transition-colors"
-                  >
-                    <Icon icon="mdi:qrcode" size={16} />
-                    <span>QR Code</span>
-                  </Button>
-                </div>
-              </div>
-
               <div className="mt-6 p-4 rounded-lg" style={{ backgroundColor: 'rgba(6, 0, 17, 0.3)', border: '1px solid rgba(255, 255, 255, 0.2)' }}>
                 <p className="text-gray-300 text-sm">
                   💡 Cross-chain payments are processed through OmniPay's bridge network for maximum security and efficiency.
@@ -303,6 +363,57 @@ export default function PaymentsPage() {
               </div>
             </Card>
           </div>
+          )}
+
+          {activeTab === 'history' && (
+            <Card className="p-6">
+              <div className="flex items-center space-x-2 mb-6">
+                <Icon icon={UI_ICONS.history} size={24} className="text-white" />
+                <h2 className="text-xl font-semibold text-white">Transaction History</h2>
+              </div>
+              
+              {isLoadingHistory ? (
+                <div className="text-center py-12">
+                  <Icon icon={UI_ICONS.pending} size={48} className="mx-auto mb-4 text-gray-400 animate-spin" />
+                  <p className="text-gray-400">Loading transaction history...</p>
+                </div>
+              ) : paymentHistory && Array.isArray(paymentHistory) && paymentHistory.length > 0 ? (
+                <div className="space-y-4">
+                  {paymentHistory.map((payment: any, index: number) => (
+                    <div key={index} className="p-4 bg-white/5 rounded-xl border border-white/10">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-4">
+                          <div className="w-10 h-10 bg-green-500/20 rounded-full flex items-center justify-center">
+                            <Icon icon={UI_ICONS.send} size={20} className="text-green-400" />
+                          </div>
+                          <div>
+                            <p className="text-white font-semibold">
+                              {formatPaymentAmount(payment.amount)} {payment.token || 'PUSH'}
+                            </p>
+                            <p className="text-gray-400 text-sm">
+                              To: {payment.recipient ? `${payment.recipient.slice(0, 6)}...${payment.recipient.slice(-4)}` : 'Unknown'}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-green-400 text-sm font-semibold">Completed</p>
+                          <p className="text-gray-400 text-xs">
+                            {payment.timestamp ? new Date(payment.timestamp * 1000).toLocaleDateString() : 'Recent'}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <Icon icon={UI_ICONS.history} size={48} className="mx-auto mb-4 text-gray-400" />
+                  <p className="text-gray-400 mb-4">No payment history found</p>
+                  <p className="text-gray-500 text-sm">Your completed transactions will appear here</p>
+                </div>
+              )}
+            </Card>
+          )}
         </div>
       </div>
     </Layout>

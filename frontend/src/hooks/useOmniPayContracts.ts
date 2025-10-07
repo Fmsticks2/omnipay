@@ -16,13 +16,25 @@ export const useSendPayment = () => {
     reference: string
   ) => {
     try {
-      await writeContract({
-        address: OMNIPAY_CONTRACTS.CORE,
-        abi: CONTRACT_ABIS.CORE,
-        functionName: 'sendPayment',
-        args: [to, parseEther(amount), token, reference],
-        value: parseEther(amount), // For native token payments
-      });
+      // Check if it's a native token payment (ETH)
+      if (token === '0x0000000000000000000000000000000000000000') {
+        // Use payETH function for native token payments
+        await writeContract({
+          address: OMNIPAY_CONTRACTS.CORE,
+          abi: CONTRACT_ABIS.CORE,
+          functionName: 'payETH',
+          args: [to, reference],
+          value: parseEther(amount),
+        });
+      } else {
+        // Use payERC20 function for ERC20 token payments
+        await writeContract({
+          address: OMNIPAY_CONTRACTS.CORE,
+          abi: CONTRACT_ABIS.CORE,
+          functionName: 'payERC20',
+          args: [token, to, parseEther(amount), reference],
+        });
+      }
     } catch (err) {
       console.error('Payment failed:', err);
       throw err;
@@ -75,7 +87,7 @@ export const useCreateSubscription = () => {
   };
 };
 
-// Hook for reading contract data (example: get payment history)
+// Hook for reading payment history
 export const usePaymentHistory = (userAddress?: `0x${string}`) => {
   const { data, isLoading, error } = useReadContract({
     address: OMNIPAY_CONTRACTS.CORE,
@@ -94,6 +106,87 @@ export const usePaymentHistory = (userAddress?: `0x${string}`) => {
   };
 };
 
+// Hook for reading user subscriptions
+export const useUserSubscriptions = (userAddress?: `0x${string}`) => {
+  const { data, isLoading, error } = useReadContract({
+    address: OMNIPAY_CONTRACTS.SUBSCRIPTION,
+    abi: CONTRACT_ABIS.SUBSCRIPTION,
+    functionName: 'getUserSubscriptions',
+    args: userAddress ? [userAddress] : undefined,
+    query: {
+      enabled: !!userAddress,
+    },
+  });
+
+  return {
+    subscriptions: data,
+    isLoading,
+    error,
+  };
+};
+
+// Hook for canceling a subscription
+export const useCancelSubscription = () => {
+  const { writeContract, data: hash, isPending, error } = useWriteContract();
+  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
+    hash,
+  });
+
+  const cancelSubscription = async (subscriptionId: bigint) => {
+    try {
+      await writeContract({
+        address: OMNIPAY_CONTRACTS.SUBSCRIPTION,
+        abi: CONTRACT_ABIS.SUBSCRIPTION,
+        functionName: 'cancelSubscription',
+        args: [subscriptionId],
+      });
+    } catch (err) {
+      console.error('Subscription cancellation failed:', err);
+      throw err;
+    }
+  };
+
+  return {
+    cancelSubscription,
+    hash,
+    isPending,
+    isConfirming,
+    isSuccess,
+    error,
+  };
+};
+
+// Hook for executing a subscription payment
+export const useExecuteSubscription = () => {
+  const { writeContract, data: hash, isPending, error } = useWriteContract();
+  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
+    hash,
+  });
+
+  const executeSubscription = async (subscriptionId: bigint) => {
+    try {
+      await writeContract({
+        address: OMNIPAY_CONTRACTS.SUBSCRIPTION,
+        abi: CONTRACT_ABIS.SUBSCRIPTION,
+        functionName: 'executeSubscription',
+        args: [subscriptionId],
+      });
+    } catch (err) {
+      console.error('Subscription execution failed:', err);
+      throw err;
+    }
+  };
+
+  return {
+    executeSubscription,
+    hash,
+    isPending,
+    isConfirming,
+    isSuccess,
+    error,
+  };
+};
+
 // Utility functions for formatting
 export const formatPaymentAmount = (amount: bigint) => {
   return formatEther(amount);
@@ -101,4 +194,25 @@ export const formatPaymentAmount = (amount: bigint) => {
 
 export const parsePaymentAmount = (amount: string) => {
   return parseEther(amount);
+};
+
+// Utility function to format subscription interval
+export const formatSubscriptionInterval = (intervalInSeconds: bigint) => {
+  const seconds = Number(intervalInSeconds);
+  const days = Math.floor(seconds / (24 * 60 * 60));
+  
+  if (days === 1) return 'Daily';
+  if (days === 7) return 'Weekly';
+  if (days === 30) return 'Monthly';
+  if (days === 90) return 'Quarterly';
+  if (days === 365) return 'Yearly';
+  
+  return `Every ${days} days`;
+};
+
+// Utility function to get next payment date
+export const getNextPaymentDate = (lastPayment: bigint, interval: bigint) => {
+  const lastPaymentMs = Number(lastPayment) * 1000;
+  const intervalMs = Number(interval) * 1000;
+  return new Date(lastPaymentMs + intervalMs);
 };

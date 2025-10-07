@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAccount, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import { parseEther } from 'viem';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
@@ -7,52 +7,52 @@ import type { FunctionComponent } from '../common/types';
 import Layout from '../components/layout/Layout';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
-import Icon from '../components/ui/Icon';
+import Icon, { TokenIcon, ChainIcon } from '../components/ui/Icon';
 import { OMNIPAY_CONTRACTS, CONTRACT_ABIS } from '../config/contracts';
 import { TOKEN_ICONS, CHAIN_ICONS } from '../components/ui/iconConstants';
 
-// Enhanced token and chain configurations
+// Supported tokens for bridging
 const SUPPORTED_TOKENS = {
   mainnet: [
-    { symbol: 'ETH', name: 'Ethereum', icon: TOKEN_ICONS.ETH, decimals: 18 },
-    { symbol: 'USDC', name: 'USD Coin', icon: TOKEN_ICONS.USDC, decimals: 6 },
-    { symbol: 'USDT', name: 'Tether', icon: TOKEN_ICONS.USDT, decimals: 6 },
-    { symbol: 'DAI', name: 'Dai Stablecoin', icon: TOKEN_ICONS.DAI, decimals: 18 },
-    { symbol: 'WBTC', name: 'Wrapped Bitcoin', icon: TOKEN_ICONS.WBTC, decimals: 8 },
-    { symbol: 'MATIC', name: 'Polygon', icon: TOKEN_ICONS.MATIC, decimals: 18 },
-    { symbol: 'BNB', name: 'BNB', icon: TOKEN_ICONS.BNB, decimals: 18 },
-    { symbol: 'AVAX', name: 'Avalanche', icon: TOKEN_ICONS.AVAX, decimals: 18 },
-    { symbol: 'FTM', name: 'Fantom', icon: TOKEN_ICONS.FTM, decimals: 18 },
-    { symbol: 'ARB', name: 'Arbitrum', icon: TOKEN_ICONS.ARB, decimals: 18 },
-    { symbol: 'OP', name: 'Optimism', icon: TOKEN_ICONS.OP, decimals: 18 },
+    { symbol: 'ETH', name: 'Ethereum', icon: 'eth' as keyof typeof TOKEN_ICONS, decimals: 18 },
+    { symbol: 'USDC', name: 'USD Coin', icon: 'usdc' as keyof typeof TOKEN_ICONS, decimals: 6 },
+    { symbol: 'USDT', name: 'Tether', icon: 'usdt' as keyof typeof TOKEN_ICONS, decimals: 6 },
+    { symbol: 'DAI', name: 'Dai Stablecoin', icon: 'dai' as keyof typeof TOKEN_ICONS, decimals: 18 },
+    { symbol: 'WBTC', name: 'Wrapped Bitcoin', icon: 'wbtc' as keyof typeof TOKEN_ICONS, decimals: 8 },
+    { symbol: 'MATIC', name: 'Polygon', icon: 'matic' as keyof typeof TOKEN_ICONS, decimals: 18 },
+    { symbol: 'BNB', name: 'BNB', icon: 'bnb' as keyof typeof TOKEN_ICONS, decimals: 18 },
+    { symbol: 'AVAX', name: 'Avalanche', icon: 'avax' as keyof typeof TOKEN_ICONS, decimals: 18 },
+    { symbol: 'FTM', name: 'Fantom', icon: 'ftm' as keyof typeof TOKEN_ICONS, decimals: 18 },
+    { symbol: 'ARB', name: 'Arbitrum', icon: 'arb' as keyof typeof TOKEN_ICONS, decimals: 18 },
+    { symbol: 'OP', name: 'Optimism', icon: 'op' as keyof typeof TOKEN_ICONS, decimals: 18 },
   ],
   testnet: [
-    { symbol: 'ETH', name: 'Sepolia ETH', icon: TOKEN_ICONS.ETH, decimals: 18 },
-    { symbol: 'PUSH', name: 'Push Protocol Donut', icon: TOKEN_ICONS.PUSH, decimals: 18 },
-    { symbol: 'USDC', name: 'Test USDC', icon: TOKEN_ICONS.USDC, decimals: 6 },
-    { symbol: 'USDT', name: 'Test USDT', icon: TOKEN_ICONS.USDT, decimals: 6 },
-    { symbol: 'DAI', name: 'Test DAI', icon: TOKEN_ICONS.DAI, decimals: 18 },
+    { symbol: 'ETH', name: 'Sepolia ETH', icon: 'eth' as keyof typeof TOKEN_ICONS, decimals: 18 },
+    { symbol: 'PUSH', name: 'Push Protocol Donut', icon: 'push' as keyof typeof TOKEN_ICONS, decimals: 18 },
+    { symbol: 'USDC', name: 'Test USDC', icon: 'usdc' as keyof typeof TOKEN_ICONS, decimals: 6 },
+    { symbol: 'USDT', name: 'Test USDT', icon: 'usdt' as keyof typeof TOKEN_ICONS, decimals: 6 },
+    { symbol: 'DAI', name: 'Test DAI', icon: 'dai' as keyof typeof TOKEN_ICONS, decimals: 18 },
   ]
 };
 
 const SUPPORTED_CHAINS = {
   mainnet: [
-    { id: 'ethereum', name: 'Ethereum', icon: CHAIN_ICONS.ethereum, chainId: 1 },
-    { id: 'polygon', name: 'Polygon', icon: CHAIN_ICONS.polygon, chainId: 137 },
-    { id: 'arbitrum', name: 'Arbitrum', icon: CHAIN_ICONS.arbitrum, chainId: 42161 },
-    { id: 'optimism', name: 'Optimism', icon: CHAIN_ICONS.optimism, chainId: 10 },
-    { id: 'base', name: 'Base', icon: CHAIN_ICONS.base, chainId: 8453 },
-    { id: 'avalanche', name: 'Avalanche', icon: CHAIN_ICONS.avalanche, chainId: 43114 },
-    { id: 'bsc', name: 'BNB Chain', icon: CHAIN_ICONS.bsc, chainId: 56 },
-    { id: 'fantom', name: 'Fantom', icon: CHAIN_ICONS.fantom, chainId: 250 },
+    { id: 'ethereum', name: 'Ethereum', icon: 'ethereum' as keyof typeof CHAIN_ICONS, chainId: 1 },
+    { id: 'polygon', name: 'Polygon', icon: 'polygon' as keyof typeof CHAIN_ICONS, chainId: 137 },
+    { id: 'arbitrum', name: 'Arbitrum', icon: 'arbitrum' as keyof typeof CHAIN_ICONS, chainId: 42161 },
+    { id: 'optimism', name: 'Optimism', icon: 'optimism' as keyof typeof CHAIN_ICONS, chainId: 10 },
+    { id: 'base', name: 'Base', icon: 'base' as keyof typeof CHAIN_ICONS, chainId: 8453 },
+    { id: 'avalanche', name: 'Avalanche', icon: 'avalanche' as keyof typeof CHAIN_ICONS, chainId: 43114 },
+    { id: 'bsc', name: 'BNB Chain', icon: 'bsc' as keyof typeof CHAIN_ICONS, chainId: 56 },
+    { id: 'fantom', name: 'Fantom', icon: 'fantom' as keyof typeof CHAIN_ICONS, chainId: 250 },
   ],
   testnet: [
-    { id: 'sepolia', name: 'Sepolia Testnet', icon: CHAIN_ICONS.sepolia, chainId: 11155111 },
-    { id: 'push', name: 'Push Protocol Testnet', icon: CHAIN_ICONS.push, chainId: 1442 },
-    { id: 'polygon-mumbai', name: 'Polygon Mumbai', icon: CHAIN_ICONS.polygon, chainId: 80001 },
-    { id: 'arbitrum-goerli', name: 'Arbitrum Goerli', icon: CHAIN_ICONS.arbitrum, chainId: 421613 },
-    { id: 'optimism-goerli', name: 'Optimism Goerli', icon: CHAIN_ICONS.optimism, chainId: 420 },
-    { id: 'base-goerli', name: 'Base Goerli', icon: CHAIN_ICONS.base, chainId: 84531 },
+    { id: 'sepolia', name: 'Sepolia Testnet', icon: 'sepolia' as keyof typeof CHAIN_ICONS, chainId: 11155111 },
+    { id: 'push', name: 'Push Protocol Testnet', icon: 'push' as keyof typeof CHAIN_ICONS, chainId: 1442 },
+    { id: 'polygon-mumbai', name: 'Polygon Mumbai', icon: 'polygon' as keyof typeof CHAIN_ICONS, chainId: 80001 },
+    { id: 'arbitrum-goerli', name: 'Arbitrum Goerli', icon: 'arbitrum' as keyof typeof CHAIN_ICONS, chainId: 421613 },
+    { id: 'optimism-goerli', name: 'Optimism Goerli', icon: 'optimism' as keyof typeof CHAIN_ICONS, chainId: 420 },
+    { id: 'base-goerli', name: 'Base Goerli', icon: 'base' as keyof typeof CHAIN_ICONS, chainId: 84531 },
   ]
 };
 
@@ -117,17 +117,30 @@ const BridgePage = (): FunctionComponent => {
       if (!chain || chain.id !== 42101) {
         throw new Error('Please switch to Push Testnet (Chain ID: 42101) to use the bridge');
       }
+
+      // Map target chain names to chain IDs
+      const chainIdMap: { [key: string]: number } = {
+        'sepolia': 11155111,
+        'polygon': 137,
+        'bsc': 56,
+        'avalanche': 43114,
+        'fantom': 250,
+        'arbitrum': 42161,
+        'optimism': 10
+      };
+
+      const targetChainId = chainIdMap[formData.targetChain] || 11155111; // Default to Sepolia
       
       await writeContract({
         address: OMNIPAY_CONTRACTS.BRIDGE,
         abi: CONTRACT_ABIS.BRIDGE,
-        functionName: 'bridgePayment',
+        functionName: 'initiateCrossChainPayment',
         args: [
           formData.recipient as `0x${string}`,
+          '0x0000000000000000000000000000000000000000' as `0x${string}`, // ETH address
           parseEther(formData.amount),
-          '0x0000000000000000000000000000000000000000' as `0x${string}`, // ETH
-          formData.message,
-          BigInt(1), // target chain ID - should be dynamic based on formData.targetChain
+          BigInt(targetChainId),
+          formData.message || 'Bridge payment',
         ],
         value: parseEther(formData.amount),
       });
@@ -137,10 +150,21 @@ const BridgePage = (): FunctionComponent => {
     }
   };
 
-  // Watch for transaction success
-  if (isSuccess && bridgeStep === 'processing') {
-    setBridgeStep('complete');
-  }
+  // Watch for transaction success using useEffect
+  useEffect(() => {
+    if (isSuccess && bridgeStep === 'processing') {
+      setBridgeStep('complete');
+    }
+  }, [isSuccess, bridgeStep]);
+
+  // Handle transaction errors
+  useEffect(() => {
+    if (hash && !isConfirming && !isSuccess && bridgeStep === 'processing') {
+      // Transaction failed or was rejected
+      console.error('Transaction failed or was rejected');
+      setBridgeStep('form');
+    }
+  }, [hash, isConfirming, isSuccess, bridgeStep]);
 
   // TODO: Replace with real transaction data from contract events
   const recentTransactions: any[] = [];[
@@ -374,7 +398,7 @@ const BridgePage = (): FunctionComponent => {
                               : { border: '1px solid rgba(255, 255, 255, 0.1)' }
                           }
                         >
-                          <Icon icon={token.icon} size={20} />
+                          <TokenIcon token={token.icon} size={20} />
                           <div className="text-left">
                             <div className="text-sm font-medium">{token.symbol}</div>
                             <div className="text-xs opacity-60">{token.name}</div>
@@ -427,7 +451,7 @@ const BridgePage = (): FunctionComponent => {
                               : { border: '1px solid rgba(255, 255, 255, 0.1)' }
                           }
                         >
-                          <Icon icon={chain.icon} size={20} />
+                          <ChainIcon chain={chain.icon} size={20} />
                           <div className="text-left">
                             <div className="text-sm font-medium">{chain.name}</div>
                             <div className="text-xs opacity-60">Chain ID: {chain.chainId}</div>
@@ -524,7 +548,7 @@ const BridgePage = (): FunctionComponent => {
                   <div className="grid grid-cols-2 gap-3">
                     {currentChains.map((chain) => (
                       <div key={chain.id} className="flex items-center gap-3 p-3 bg-white/5 rounded-lg">
-                        <Icon icon={chain.icon} size={20} />
+                        <ChainIcon chain={chain.icon} size={20} />
                         <div>
                           <div className="text-white font-medium text-sm">{chain.name}</div>
                           <div className="text-gray-400 text-xs">ID: {chain.chainId}</div>

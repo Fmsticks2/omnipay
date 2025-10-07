@@ -6,25 +6,73 @@ import type { FunctionComponent } from '../common/types';
 import Layout from '../components/layout/Layout';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
-import Icon, { ChainIcon } from '../components/ui/Icon';
-import { UI_ICONS, CHAIN_ICONS } from '../components/ui/iconConstants';
-import { useCreateSubscription } from '../hooks/useOmniPayContracts';
+import Icon, { ChainIcon, TokenIcon } from '../components/ui/Icon';
+import { UI_ICONS, CHAIN_ICONS, TOKEN_ICONS } from '../components/ui/iconConstants';
+import { 
+  useCreateSubscription, 
+  useUserSubscriptions, 
+  useCancelSubscription, 
+  useExecuteSubscription,
+  formatPaymentAmount,
+  formatSubscriptionInterval,
+  getNextPaymentDate
+} from '../hooks/useOmniPayContracts';
+import { SUPPORTED_TOKENS } from '../config/contracts';
 import { getChainMetadata } from '../config/chains';
+
+// Token configuration with proper addresses and metadata
+const AVAILABLE_TOKENS = [
+  {
+    symbol: 'PUSH',
+    name: 'Push Token',
+    address: 'native',
+    icon: 'push' as keyof typeof TOKEN_ICONS,
+    decimals: 18,
+  },
+  {
+    symbol: 'USDC',
+    name: 'USD Coin',
+    address: SUPPORTED_TOKENS.USDC,
+    icon: 'usdc' as keyof typeof TOKEN_ICONS,
+    decimals: 6,
+  },
+  {
+    symbol: 'USDT',
+    name: 'Tether USD',
+    address: SUPPORTED_TOKENS.USDT,
+    icon: 'usdt' as keyof typeof TOKEN_ICONS,
+    decimals: 6,
+  },
+  {
+    symbol: 'DAI',
+    name: 'Dai Stablecoin',
+    address: SUPPORTED_TOKENS.DAI,
+    icon: 'dai' as keyof typeof TOKEN_ICONS,
+    decimals: 18,
+  },
+] as const;
 
 const SubscriptionsPage = (): FunctionComponent => {
   const { address, isConnected, chain } = useAccount();
   const { data: balance } = useBalance({ address });
   const { createSubscription, isPending, isConfirming, isSuccess, error } = useCreateSubscription();
+  const { subscriptions, isLoading: isLoadingSubscriptions } = useUserSubscriptions(address);
+  const { cancelSubscription, isPending: isCanceling } = useCancelSubscription();
+  const { executeSubscription, isPending: isExecuting } = useExecuteSubscription();
   
   const [activeTab, setActiveTab] = useState<'create' | 'manage'>('create');
+  const [showTokenSelector, setShowTokenSelector] = useState(false);
   const [formData, setFormData] = useState({
     merchant: '',
-    token: '',
+    token: 'native',
     amount: '',
     interval: '30', // days
-    paymentType: 'ETH' as 'ETH' | 'ERC20',
     description: ''
   });
+
+  const selectedToken = AVAILABLE_TOKENS.find(token => 
+    token.address === formData.token || (formData.token === 'native' && token.address === 'native')
+  ) || AVAILABLE_TOKENS[0];
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({
@@ -33,11 +81,16 @@ const SubscriptionsPage = (): FunctionComponent => {
     });
   };
 
+  const handleTokenSelect = (tokenAddress: string) => {
+    setFormData({ ...formData, token: tokenAddress });
+    setShowTokenSelector(false);
+  };
+
   const handleCreateSubscription = async () => {
     if (!isConnected || !address) return;
 
     try {
-      const tokenAddress = formData.paymentType === 'ETH' 
+      const tokenAddress = formData.token === 'native' 
         ? '0x0000000000000000000000000000000000000000' as `0x${string}`
         : formData.token as `0x${string}`;
 
@@ -51,6 +104,22 @@ const SubscriptionsPage = (): FunctionComponent => {
       );
     } catch (err) {
       console.error('Subscription creation failed:', err);
+    }
+  };
+
+  const handleCancelSubscription = async (subscriptionId: bigint) => {
+    try {
+      await cancelSubscription(subscriptionId);
+    } catch (err) {
+      console.error('Subscription cancellation failed:', err);
+    }
+  };
+
+  const handleExecuteSubscription = async (subscriptionId: bigint) => {
+    try {
+      await executeSubscription(subscriptionId);
+    } catch (err) {
+      console.error('Subscription execution failed:', err);
     }
   };
 
@@ -72,24 +141,7 @@ const SubscriptionsPage = (): FunctionComponent => {
     );
   };
 
-  const mockSubscriptions = [
-    {
-      id: 1,
-      merchant: '0x1234...5678',
-      amount: '10 USDC',
-      interval: '30 days',
-      nextPayment: '2024-11-05',
-      status: 'active'
-    },
-    {
-      id: 2,
-      merchant: '0xabcd...efgh',
-      amount: '0.01 ETH',
-      interval: '7 days',
-      nextPayment: '2024-10-13',
-      status: 'active'
-    }
-  ];
+
 
   return (
     <Layout>
@@ -183,55 +235,48 @@ const SubscriptionsPage = (): FunctionComponent => {
                     <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Create New Subscription</h2>
                   </div>
                   
-                  {/* Payment Type */}
+                  {/* Token Selection */}
                   <div className="mb-6">
-                    <label className="block text-sm font-medium text-gray-300 mb-3 flex items-center space-x-2">
+                    <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center space-x-2">
                       <Icon icon="mdi:coin" size={16} />
-                      <span>Payment Type</span>
+                      <span>Payment Token</span>
                     </label>
-                    <div className="flex gap-2">
+                    <div className="relative">
                       <button
-                        onClick={() => setFormData({...formData, paymentType: 'ETH'})}
-                        className={`flex-1 py-3 px-4 rounded-xl font-medium transition-all flex items-center justify-center space-x-2 ${
-                          formData.paymentType === 'ETH'
-                            ? 'bg-blue-600 text-white'
-                            : 'bg-white/10 text-gray-300 hover:bg-white/20'
-                        }`}
+                        type="button"
+                        onClick={() => setShowTokenSelector(!showTokenSelector)}
+                        className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:border-white/40 transition-colors flex items-center justify-between"
                       >
-                        <Icon icon="cryptocurrency:eth" size={20} />
-                        <span>ETH</span>
+                        <div className="flex items-center space-x-3">
+                          <TokenIcon token={selectedToken.icon} size={20} />
+                          <div className="text-left">
+                            <div className="font-semibold">{selectedToken.symbol}</div>
+                            <div className="text-sm text-gray-400">{selectedToken.name}</div>
+                          </div>
+                        </div>
+                        <Icon icon="mdi:chevron-down" size={20} />
                       </button>
-                      <button
-                        onClick={() => setFormData({...formData, paymentType: 'ERC20'})}
-                        className={`flex-1 py-3 px-4 rounded-xl font-medium transition-all flex items-center justify-center space-x-2 ${
-                          formData.paymentType === 'ERC20'
-                            ? 'bg-blue-600 text-white'
-                            : 'bg-white/10 text-gray-300 hover:bg-white/20'
-                        }`}
-                      >
-                        <Icon icon="mdi:coin" size={20} />
-                        <span>ERC20</span>
-                      </button>
+                      
+                      {showTokenSelector && (
+                        <div className="absolute top-full left-0 right-0 mt-1 bg-black/90 border border-white/20 rounded-xl z-10 max-h-60 overflow-y-auto">
+                          {AVAILABLE_TOKENS.map((token) => (
+                            <button
+                              key={token.address}
+                              type="button"
+                              onClick={() => handleTokenSelect(token.address)}
+                              className="w-full px-4 py-3 text-left hover:bg-white/10 transition-colors flex items-center space-x-3 first:rounded-t-xl last:rounded-b-xl"
+                            >
+                              <TokenIcon token={token.icon} size={20} />
+                              <div>
+                                <div className="font-semibold text-white">{token.symbol}</div>
+                                <div className="text-sm text-gray-400">{token.name}</div>
+                              </div>
+                            </button>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </div>
-
-                  {/* Token Address (ERC20 only) */}
-                  {formData.paymentType === 'ERC20' && (
-                    <div className="mb-6">
-                      <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center space-x-2">
-                        <Icon icon="mdi:link" size={16} />
-                        <span>Token Address</span>
-                      </label>
-                      <input
-                        type="text"
-                        name="token"
-                        value={formData.token}
-                        onChange={handleInputChange}
-                        placeholder="0x..."
-                        className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-white/40 transition-colors"
-                      />
-                    </div>
-                  )}
 
                   {/* Description */}
                   <div className="mb-6">
@@ -269,7 +314,7 @@ const SubscriptionsPage = (): FunctionComponent => {
                   <div className="mb-6">
                     <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center space-x-2">
                       <Icon icon="mdi:currency-usd" size={16} />
-                      <span>Amount per Payment ({formData.paymentType})</span>
+                      <span>Amount per Payment ({selectedToken.symbol})</span>
                     </label>
                     <input
                       type="number"
@@ -291,17 +336,17 @@ const SubscriptionsPage = (): FunctionComponent => {
                       onChange={handleInputChange}
                       className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:border-white/40 transition-colors"
                     >
-                      <option value="1">Daily</option>
-                      <option value="7">Weekly</option>
-                      <option value="30">Monthly</option>
-                      <option value="90">Quarterly</option>
-                      <option value="365">Yearly</option>
+                      <option value="1" style={{ backgroundColor: '#060011' }}>Daily</option>
+                      <option value="7" style={{ backgroundColor: '#060011' }}>Weekly</option>
+                      <option value="30" style={{ backgroundColor: '#060011' }}>Monthly</option>
+                      <option value="90" style={{ backgroundColor: '#060011' }}>Quarterly</option>
+                      <option value="365" style={{ backgroundColor: '#060011' }}>Yearly</option>
                     </select>
                   </div>
 
                   <Button 
                     onClick={handleCreateSubscription}
-                    disabled={isPending || isConfirming}
+                    disabled={isPending || isConfirming || !formData.merchant || !formData.amount}
                     className="w-full"
                     size="lg"
                     variant="secondary"
@@ -312,7 +357,7 @@ const SubscriptionsPage = (): FunctionComponent => {
                   {error && (
                     <div className="mt-4 p-4 bg-red-900/50 border border-red-500 rounded-xl">
                       <p className="text-red-300 text-sm">
-                        Error: {error.message}
+                        Error: {error?.message || 'An unknown error occurred'}
                       </p>
                     </div>
                   )}
@@ -346,9 +391,12 @@ const SubscriptionsPage = (): FunctionComponent => {
                     
                     <div className="flex justify-between items-center py-3 border-b border-white/10">
                       <span className="text-gray-400">Amount</span>
-                      <span className="text-white font-semibold">
-                        {formData.amount || '0'} {formData.paymentType === 'ETH' ? balance?.symbol : 'Token'}
-                      </span>
+                      <div className="flex items-center space-x-2">
+                        <TokenIcon token={selectedToken.icon} size={20} />
+                        <span className="text-white font-semibold">
+                          {formData.amount || '0'} {selectedToken.symbol}
+                        </span>
+                      </div>
                     </div>
                     
                     <div className="flex justify-between items-center py-3 border-b border-white/10">
@@ -360,9 +408,17 @@ const SubscriptionsPage = (): FunctionComponent => {
                     
                     <div className="flex justify-between items-center py-3">
                       <span className="text-gray-400">Network</span>
-                      <span className="text-white">
-                        {chainMetadata?.name || 'Unknown'}
-                      </span>
+                      <div className="flex items-center space-x-2">
+                        {chainMetadata && (
+                          <ChainIcon 
+                            chain={chainMetadata.name.toLowerCase() as keyof typeof CHAIN_ICONS} 
+                            size={20} 
+                          />
+                        )}
+                        <span className="text-white">
+                          {chainMetadata?.name || 'Unknown'}
+                        </span>
+                      </div>
                     </div>
                   </div>
 
@@ -440,44 +496,84 @@ const SubscriptionsPage = (): FunctionComponent => {
               <Card>
                 <h2 className="text-2xl font-bold text-white mb-6">Your Subscriptions</h2>
                 
-                <div className="text-center py-12">
-                  <p className="text-gray-400 mb-4">Connect to view your active subscriptions</p>
-                  <Button onClick={() => setActiveTab('create')} variant="outline">
-                    Create Your First Subscription
-                  </Button>
-                </div>
-                
-                {/* Example subscriptions for demo */}
-                <div className="space-y-4">
-                  {mockSubscriptions.map((sub) => (
-                    <div key={sub.id} className="p-6 bg-white/5 rounded-xl border border-white/10">
-                      <div className="flex items-center justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-4 mb-2">
-                            <h3 className="text-lg font-semibold text-white">{sub.amount}</h3>
-                            <span className={`px-3 py-1 rounded-full text-sm ${
-                              sub.status === 'active' 
-                                ? 'bg-green-500/20 text-green-400' 
-                                : 'bg-red-500/20 text-red-400'
-                            }`}>
-                              {sub.status}
-                            </span>
+                {isLoadingSubscriptions ? (
+                  <div className="text-center py-12">
+                    <Icon icon={UI_ICONS.pending} size={48} className="mx-auto mb-4 text-gray-400 animate-spin" />
+                    <p className="text-gray-400">Loading your subscriptions...</p>
+                  </div>
+                ) : subscriptions && Array.isArray(subscriptions) && subscriptions.length > 0 ? (
+                  <div className="space-y-4">
+                    {subscriptions.map((subscription: any, index: number) => {
+                      const tokenInfo = AVAILABLE_TOKENS.find(t => 
+                        t.address === subscription.token || 
+                        (subscription.token === '0x0000000000000000000000000000000000000000' && t.address === 'native')
+                      ) || AVAILABLE_TOKENS[0];
+                      
+                      const nextPayment = getNextPaymentDate(subscription.lastPayment, subscription.interval);
+                      
+                      return (
+                        <div key={index} className="p-6 bg-white/5 rounded-xl border border-white/10">
+                          <div className="flex items-center justify-between">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-4 mb-2">
+                                <div className="flex items-center space-x-2">
+                                  <TokenIcon token={tokenInfo.icon} size={24} />
+                                  <h3 className="text-lg font-semibold text-white">
+                                    {formatPaymentAmount(subscription.amount)} {tokenInfo.symbol}
+                                  </h3>
+                                </div>
+                                <span className={`px-3 py-1 rounded-full text-sm ${
+                                  subscription.isActive 
+                                    ? 'bg-green-500/20 text-green-400' 
+                                    : 'bg-red-500/20 text-red-400'
+                                }`}>
+                                  {subscription.isActive ? 'Active' : 'Inactive'}
+                                </span>
+                              </div>
+                              <p className="text-gray-400 text-sm mb-1">
+                                To: {subscription.merchant ? `${subscription.merchant.slice(0, 6)}...${subscription.merchant.slice(-4)}` : 'Unknown'}
+                              </p>
+                              <p className="text-gray-400 text-sm">
+                                {formatSubscriptionInterval(subscription.interval)} • Next: {nextPayment.toLocaleDateString()}
+                              </p>
+                              {subscription.description && (
+                                <p className="text-gray-300 text-sm mt-1">{subscription.description}</p>
+                              )}
+                            </div>
+                            <div className="flex gap-2">
+                              <Button 
+                                size="sm" 
+                                variant="outline"
+                                onClick={() => handleExecuteSubscription(subscription.id)}
+                                disabled={isExecuting || !subscription.isActive}
+                              >
+                                Execute Now
+                              </Button>
+                              <Button 
+                                size="sm" 
+                                variant="ghost" 
+                                className="text-red-400 hover:bg-red-500/20"
+                                onClick={() => handleCancelSubscription(subscription.id)}
+                                disabled={isCanceling || !subscription.isActive}
+                              >
+                                Cancel
+                              </Button>
+                            </div>
                           </div>
-                          <p className="text-gray-400 text-sm mb-1">To: {sub.merchant}</p>
-                          <p className="text-gray-400 text-sm">Every {sub.interval} • Next: {sub.nextPayment}</p>
                         </div>
-                        <div className="flex gap-2">
-                          <Button size="sm" variant="outline">
-                            Execute Now
-                          </Button>
-                          <Button size="sm" variant="ghost" className="text-red-400 hover:bg-red-500/20">
-                            Cancel
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="text-center py-12">
+                    <Icon icon={UI_ICONS.subscriptions} size={48} className="mx-auto mb-4 text-gray-400" />
+                    <p className="text-gray-400 mb-4">No subscriptions found</p>
+                    <p className="text-gray-500 text-sm mb-6">Create your first subscription to get started</p>
+                    <Button onClick={() => setActiveTab('create')} variant="outline">
+                      Create Your First Subscription
+                    </Button>
+                  </div>
+                )}
               </Card>
             </motion.div>
           )}

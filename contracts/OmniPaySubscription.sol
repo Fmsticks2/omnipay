@@ -106,8 +106,10 @@ contract OmniPaySubscription is Ownable, ReentrancyGuard {
         uint256 intervalSeconds
     ) external returns (uint256 id) {
         require(merchant != address(0), "Invalid merchant");
+        require(merchant != msg.sender, "Cannot subscribe to yourself");
         require(amount > 0, "Amount = 0");
         require(intervalSeconds >= 60, "Interval too short");
+        require(intervalSeconds <= 365 days, "Interval too long");
 
         id = nextId++;
         subscriptions[id] = Subscription({
@@ -127,47 +129,143 @@ contract OmniPaySubscription is Ownable, ReentrancyGuard {
     /// @notice Execute a due subscription payment
     /// @param id Subscription id
     function executeSubscription(uint256 id) external payable nonReentrant {
+        require(id > 0 && id < nextId, "Invalid subscription ID");
         Subscription storage s = subscriptions[id];
         require(s.active, "Inactive");
         require(s.subscriber == msg.sender, "Only subscriber");
         require(block.timestamp >= s.nextPaymentDue, "Not due");
 
-        if (s.token == address(0)) {
-            require(msg.value == s.amount, "Incorrect ETH amount");
-            (bool ok, ) = payable(s.merchant).call{value: s.amount}("");
-            require(ok, "ETH transfer failed");
-        } else {
-            IERC20(s.token).safeTransferFrom(s.subscriber, s.merchant, s.amount);
-        }
+        (bool paymentSuccess, string memory failureReason) = _processPayment(s);
 
+        if (paymentSuccess) {
+            _onPaymentSuccess(s);
+        } else {
+            _onPaymentFailure(s, failureReason);
+        }
+    }
+
+    function _processPayment(Subscription storage s) private returns (bool success, string memory reason) {
+        if (s.token == address(0)) {
+            return _processEthPayment(s);
+        } else {
+            return _processTokenPayment(s);
+        }
+    }
+
+    function _processEthPayment(Subscription storage s) private returns (bool success, string memory reason) {
+        if (msg.value != s.amount) {
+            return (false, "Incorrect ETH amount");
+        }
+        (bool ok, ) = payable(s.merchant).call{value: s.amount}("");
+        if (!ok) {
+            return (false, "ETH transfer failed");
+        }
+        return (true, "");
+    }
+
+    function _processTokenPayment(Subscription storage s) private returns (bool success, string memory reason) {
+        if (msg.value != 0) {
+            return (false, "No ETH needed for token payment");
+        }
+        try IERC20(s.token).transferFrom(s.subscriber, s.merchant, s.amount) returns (bool ok) {
+            if (!ok) {
+                return (false, "Token transfer failed");
+            }
+            return (true, "");
+        } catch Error(string memory err) {
+            return (false, err);
+        } catch {
+            return (false, "Token transfer failed");
+        }
+    }
+
+    function _onPaymentSuccess(Subscription storage s) private {
         s.nextPaymentDue = block.timestamp + s.interval;
-        emit SubscriptionExecuted(id, s.subscriber, s.merchant, s.token, s.amount, s.nextPaymentDue);
+        emit SubscriptionExecuted(s.id, s.subscriber, s.merchant, s.token, s.amount, s.nextPaymentDue);
 
         if (notifier != address(0)) {
             try IOmniPayNotifier(notifier).notifySubscriptionExecuted(
-                id,
+                s.id,
                 s.subscriber,
                 s.merchant,
                 s.token,
                 s.amount,
                 s.nextPaymentDue
-            ) {} catch {
-                // ignore notifier failures
-            }
+            ) {} catch {}
+        }
+    }
+
+    function _onPaymentFailure(Subscription storage s, string memory reason) private {
+        emit SubscriptionFailed(s.id, s.subscriber, s.merchant, s.token, s.amount, reason);
+
+        if (notifier != address(0)) {
+            try IOmniPayNotifier(notifier).notifyPaymentFailure(
+                s.subscriber,
+                s.merchant,
+                s.token,
+                s.amount,
+                string(abi.encodePacked("Subscription ", s.id)),
+                reason
+            ) {} catch {}
         }
     }
 
     /// @notice Cancel an active subscription
     /// @param id Subscription id
     function cancelSubscription(uint256 id) external {
+        require(id > 0 && id < nextId, "Invalid subscription ID");
         Subscription storage s = subscriptions[id];
         require(s.active, "Already inactive");
-        require(s.subscriber == msg.sender, "Only subscriber");
+        require(s.subscriber == msg.sender || msg.sender == owner(), "Only subscriber or owner");
         s.active = false;
         emit SubscriptionCancelled(id, s.subscriber, s.merchant);
 
         if (notifier != address(0)) {
             try IOmniPayNotifier(notifier).notifySubscriptionCancelled(id, s.subscriber, s.merchant) {} catch {}
         }
+    }
+
+    /// @notice Get all subscriptions for a user (gas-optimized version)
+    /// @param user Address of the user
+    /// @return userSubscriptions Array of subscriptions for the user
+    function getUserSubscriptions(address user) external view returns (Subscription[] memory userSubscriptions) {
+        require(user != address(0), "Invalid user address");
+        
+        // Use a more gas-efficient approach for small datasets
+        uint256 totalSubs = nextId - 1;
+        if (totalSubs == 0) {
+            return new Subscription[](0);
+        }
+        
+        // For large datasets, consider implementing pagination
+        require(totalSubs <= 1000, "Too many subscriptions, use pagination");
+        
+        // First, count how many subscriptions the user has
+        uint256 count = 0;
+        for (uint256 i = 1; i < nextId; i++) {
+            if (subscriptions[i].subscriber == user) {
+                unchecked { count++; }
+            }
+        }
+
+        // Create array with the correct size
+        userSubscriptions = new Subscription[](count);
+        
+        // Fill the array with user's subscriptions
+        uint256 index = 0;
+        for (uint256 i = 1; i < nextId && index < count; i++) {
+            if (subscriptions[i].subscriber == user) {
+                userSubscriptions[index] = subscriptions[i];
+                unchecked { index++; }
+            }
+        }
+    }
+
+    /// @notice Get a specific subscription by ID
+    /// @param id Subscription ID
+    /// @return subscription The subscription details
+    function getSubscription(uint256 id) external view returns (Subscription memory subscription) {
+        require(id > 0 && id < nextId, "Invalid subscription ID");
+        return subscriptions[id];
     }
 }

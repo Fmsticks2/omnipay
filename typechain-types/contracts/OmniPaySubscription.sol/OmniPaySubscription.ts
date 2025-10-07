@@ -23,12 +23,47 @@ import type {
   TypedContractMethod,
 } from "../../common";
 
+export declare namespace OmniPaySubscription {
+  export type SubscriptionStruct = {
+    id: BigNumberish;
+    subscriber: AddressLike;
+    merchant: AddressLike;
+    token: AddressLike;
+    amount: BigNumberish;
+    interval: BigNumberish;
+    nextPaymentDue: BigNumberish;
+    active: boolean;
+  };
+
+  export type SubscriptionStructOutput = [
+    id: bigint,
+    subscriber: string,
+    merchant: string,
+    token: string,
+    amount: bigint,
+    interval: bigint,
+    nextPaymentDue: bigint,
+    active: boolean
+  ] & {
+    id: bigint;
+    subscriber: string;
+    merchant: string;
+    token: string;
+    amount: bigint;
+    interval: bigint;
+    nextPaymentDue: bigint;
+    active: boolean;
+  };
+}
+
 export interface OmniPaySubscriptionInterface extends Interface {
   getFunction(
     nameOrSignature:
       | "cancelSubscription"
       | "createSubscription"
       | "executeSubscription"
+      | "getSubscription"
+      | "getUserSubscriptions"
       | "nextId"
       | "notifier"
       | "owner"
@@ -58,6 +93,14 @@ export interface OmniPaySubscriptionInterface extends Interface {
   encodeFunctionData(
     functionFragment: "executeSubscription",
     values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getSubscription",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getUserSubscriptions",
+    values: [AddressLike]
   ): string;
   encodeFunctionData(functionFragment: "nextId", values?: undefined): string;
   encodeFunctionData(functionFragment: "notifier", values?: undefined): string;
@@ -89,6 +132,14 @@ export interface OmniPaySubscriptionInterface extends Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "executeSubscription",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getSubscription",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getUserSubscriptions",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "nextId", data: BytesLike): Result;
@@ -305,6 +356,18 @@ export interface OmniPaySubscription extends BaseContract {
     "payable"
   >;
 
+  getSubscription: TypedContractMethod<
+    [id: BigNumberish],
+    [OmniPaySubscription.SubscriptionStructOutput],
+    "view"
+  >;
+
+  getUserSubscriptions: TypedContractMethod<
+    [user: AddressLike],
+    [OmniPaySubscription.SubscriptionStructOutput[]],
+    "view"
+  >;
+
   nextId: TypedContractMethod<[], [bigint], "view">;
 
   notifier: TypedContractMethod<[], [string], "view">;
@@ -364,6 +427,20 @@ export interface OmniPaySubscription extends BaseContract {
   getFunction(
     nameOrSignature: "executeSubscription"
   ): TypedContractMethod<[id: BigNumberish], [void], "payable">;
+  getFunction(
+    nameOrSignature: "getSubscription"
+  ): TypedContractMethod<
+    [id: BigNumberish],
+    [OmniPaySubscription.SubscriptionStructOutput],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "getUserSubscriptions"
+  ): TypedContractMethod<
+    [user: AddressLike],
+    [OmniPaySubscription.SubscriptionStructOutput[]],
+    "view"
+  >;
   getFunction(
     nameOrSignature: "nextId"
   ): TypedContractMethod<[], [bigint], "view">;

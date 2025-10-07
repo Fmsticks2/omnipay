@@ -1,5 +1,19 @@
 // Token icon mappings - Using iconify icons for better compatibility
 export const TOKEN_ICONS = {
+  eth: 'cryptocurrency:eth',
+  usdc: 'cryptocurrency:usdc',
+  usdt: 'cryptocurrency:usdt',
+  dai: 'cryptocurrency:dai',
+  wbtc: 'cryptocurrency:wbtc',
+  matic: 'cryptocurrency:matic',
+  bnb: 'cryptocurrency:bnb',
+  avax: 'cryptocurrency:avax',
+  ftm: 'cryptocurrency:ftm',
+  arb: 'cryptocurrency:arb',
+  op: 'cryptocurrency:op',
+  // Push Protocol Donut token
+  push: 'cryptocurrency:push',
+  // Legacy uppercase keys for backward compatibility
   ETH: 'cryptocurrency:eth',
   USDC: 'cryptocurrency:usdc',
   USDT: 'cryptocurrency:usdt',
@@ -11,9 +25,7 @@ export const TOKEN_ICONS = {
   FTM: 'cryptocurrency:ftm',
   ARB: 'cryptocurrency:arb',
   OP: 'cryptocurrency:op',
-  // Push Protocol Donut token
   PUSH: 'cryptocurrency:push',
-  // Add more tokens as needed
 } as const;
 
 // Chain icon mappings - Using iconify icons for better compatibility
